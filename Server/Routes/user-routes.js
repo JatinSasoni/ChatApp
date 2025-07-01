@@ -5,6 +5,6 @@ import { isAuthenticated } from "../Middleware/isAuthenticated.js";
 const userRouter = Router();
 
 //GET ALL USERS EXCEPT YOURSELF
-userRouter.get("/", isAuthenticated, getAllUsers);
+userRouter.get("/users", isAuthenticated, getAllUsers);
 
 export default userRouter;
