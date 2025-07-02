@@ -6,6 +6,7 @@ import userRouter from "./Routes/user-routes.js";
 import messageRouter from "./Routes/message-routes.js";
 import { Server } from "socket.io";
 import http from "http";
+import cors from "cors";
 
 //Dot-env
 configDotenv();
@@ -26,7 +27,8 @@ export const userSocketMap = {}; // object containing {userID:SocketID}
 
 //Socket.io connection handler
 io.on("connection", (socket) => {
-  const userId = socket.handshake.query.userId;
+  //socket is client from frontend
+  const userId = socket.handshake.query.userId; //provided via frontend
   console.log("user connected ", userId);
   if (userId) userSocketMap[userId] = socket.id;
 
@@ -44,10 +46,17 @@ io.on("connection", (socket) => {
 });
 
 //Middlewares
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
 
 //ROUTES
+app.use(express.static("./public"));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/message", messageRouter);

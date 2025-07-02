@@ -19,7 +19,7 @@ const userSchema = mongoose.Schema(
       bio: { type: String },
       profilePhoto: {
         type: String,
-        default: "/Logo/defaultpfp.jpg",
+        default: "./public/avatar_icon.png",
       },
     },
   },

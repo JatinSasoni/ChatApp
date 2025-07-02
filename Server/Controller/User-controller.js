@@ -27,8 +27,6 @@ export const getAllUsers = async (req, res, next) => {
     users: filteredUser,
     unseenMessages,
   });
-
-  res.end();
 };
 
 //GET ALL MESSAGES FOR SELECTED USER

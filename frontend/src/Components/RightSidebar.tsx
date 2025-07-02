@@ -1,7 +1,11 @@
 import React from "react";
-import assets from "../../chat-app-assets/assets";
+// import assets from "../../chat-app-assets/as";
 
-const RightSidebar = ({ setUserSelected, userSelected }) => {
+type props = {
+  userSelected: boolean;
+};
+
+const RightSidebar: React.FC<props> = ({ userSelected }) => {
   return (
     <section
       className={`${
@@ -14,7 +18,7 @@ const RightSidebar = ({ setUserSelected, userSelected }) => {
         {/* PFP */}
         <div className="my-2">
           <img
-            src={assets.profile_martin}
+            src="../../chat-app-assets/profile_alison.png"
             alt="Profile_Pic"
             className="size-40 rounded-full mx-auto"
           />

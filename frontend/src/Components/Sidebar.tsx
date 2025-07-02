@@ -1,6 +1,11 @@
-import assets, { userDummyData } from "../../chat-app-assets/assets";
+import type { user } from "../../types/models";
 
-const Sidebar = ({ setUserSelected, userSelected }) => {
+type props = {
+  allUsers: user[] | null;
+  setUserSelected: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Sidebar: React.FC<props> = ({ allUsers, setUserSelected }) => {
   return (
     <div className=" p-2 overflow-scroll h-full">
       {/* Header */}
@@ -8,7 +13,7 @@ const Sidebar = ({ setUserSelected, userSelected }) => {
         <p className="text-2xl text-white">Public Chats</p>
         <div className="relative group">
           <img
-            src={assets.menu_icon}
+            src="../assets/menu_icon.png"
             alt=""
             width="30"
             className="cursor-pointer"
@@ -24,7 +29,7 @@ const Sidebar = ({ setUserSelected, userSelected }) => {
       </div>
       {/* Search Contact */}
       <div className="flex gap-2 bg-blue-950 rounded-xl items-center px-2 my-3 py-1 ">
-        <img src={assets.search_icon} alt="" className="size-3" />
+        <img src="../assets/search_icon.png" alt="" className="size-3" />
         <input
           type="text"
           className="w-full outline-none text-white"
@@ -34,22 +39,25 @@ const Sidebar = ({ setUserSelected, userSelected }) => {
       {/*Friends */}
       <aside>
         <ul className="flex flex-col gap-3">
-          {userDummyData.map((user, key) => {
+          {allUsers?.map((user, key: number) => {
             return (
               <li
                 key={key}
                 className="cursor-pointer group"
-                onClick={() => setUserSelected((prev) => !prev)}
+                onClick={() => setUserSelected((prev: boolean) => !prev)}
               >
                 <div className="flex  p-1 gap-2">
                   <img
-                    src={user.profilePic}
+                    src={
+                      user?.Profile.profilePhoto ||
+                      "../../chat-app-assets/profile_alison.png"
+                    }
                     alt=""
                     className="size-11 rounded-full"
                   />
                   <div className="text-white">
                     <p className="group group-hover:scale-105 duration-300">
-                      {user.fullName}
+                      {user.username}
                     </p>
                     <p className="text-xs">Offline</p>
                   </div>

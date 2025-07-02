@@ -5,13 +5,12 @@ import { generateToken } from "../utils/generateLoginToken.js";
 //LOGIN CONTROLLER
 export const loginController = async (req, res, next) => {
   const { email, password } = req.body;
-
   try {
     const user = await UserModel.findOne({ email });
     if (!user) {
       const error = new Error("Invalid credentials");
       error.statusCode = 400;
-      return next(error);
+      throw error;
     }
 
     const isPassMatched = bcrypt.compareSync(password, user.password);
@@ -34,7 +33,6 @@ export const loginController = async (req, res, next) => {
       token,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -49,7 +47,7 @@ export const signupController = async (req, res, next) => {
     if (doesEmailExists) {
       const error = new Error("Email already exists");
       error.statusCode = 400;
-      next(error);
+      throw error;
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -65,7 +63,6 @@ export const signupController = async (req, res, next) => {
       message: "User created",
     });
   } catch (error) {
-    console.log(error.stack);
     next(error);
   }
 };

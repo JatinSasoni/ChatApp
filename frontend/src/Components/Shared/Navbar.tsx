@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
@@ -19,6 +18,8 @@ const Navbar = () => {
           <ul className="flex gap-8 p-2 cursor-pointer font-medium">
             <li onClick={() => navigate("/")}>Home</li>
             <li onClick={() => navigate("/")}>Chats</li>
+            <li onClick={() => navigate("/login")}>Login</li>
+            <li onClick={() => navigate("/signup")}>Signup</li>
             <li onClick={() => navigate("/Profile")}>Profile</li>
           </ul>
         </nav>

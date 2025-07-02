@@ -7,7 +7,6 @@ export const signupValidation = [
     .isLength({ min: 3 })
     .withMessage("minimum length:3")
     .trim()
-    .normalizeEmail()
     .escape(),
   body("email")
     .isEmail()

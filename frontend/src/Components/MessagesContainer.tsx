@@ -1,12 +1,15 @@
 import React, { useEffect, useRef } from "react";
-import assets, {
-  messagesDummyData,
-  userDummyData,
-} from "../../chat-app-assets/assets";
+import assets, { messagesDummyData } from "../../chat-app-assets/assets";
 import { convertToLocaleFormat } from "../../Utils/LocalDateFormat";
+import type { Message } from "../../types/models";
 
-const MessagesContainer = ({ userSelected, setUserSelected }) => {
-  const messageInputRef = useRef();
+type props = {
+  userSelected: boolean;
+  setUserSelected: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const MessagesContainer: React.FC<props> = ({ userSelected }) => {
+  const messageInputRef = useRef<HTMLInputElement>();
 
   useEffect(() => {
     if (messageInputRef.current && userSelected) {
@@ -45,7 +48,7 @@ const MessagesContainer = ({ userSelected, setUserSelected }) => {
             </header>
             {/* Scrollable messages container */}
             <div className="overflow-y-scroll text-white h-[530px]  ">
-              {messagesDummyData.map((message, i) => {
+              {messagesDummyData.map((message: Message, i: number) => {
                 return (
                   <div
                     key={i}
