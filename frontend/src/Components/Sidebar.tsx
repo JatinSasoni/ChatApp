@@ -1,46 +1,29 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { useEffect } from "react";
-import { api } from "../../Api/axios";
 import {
-  setAllUsers,
   setUnseenMessages,
   setUserSelected,
 } from "../../Store/Slices/message-slice";
-import axios from "axios";
+import { useFetchUsers } from "../Hooks/fetchUsers";
+import { useState } from "react";
+import type { user } from "../../types/models";
 
 const Sidebar: React.FC = () => {
   const { onlineUsers } = useSelector((state: RootState) => state.auth);
+  const [filter, setFilter] = useState<string>("");
   const { allUsers, unseenMessages } = useSelector(
     (state: RootState) => state.message
   );
   const dispatch = useDispatch();
 
-  const fetchAllUsers = async () => {
-    try {
-      const response = await api.get("/api/v1/user/get-users", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        withCredentials: true,
-      });
-      if (response.data.success) {
-        dispatch(setAllUsers(response?.data?.users || null));
-        dispatch(setUnseenMessages(response.data.unseenMessages));
-      }
-    } catch (error) {
-      //*Type guard
-      if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
-      } else {
-        console.log("An unexpected error occurred:", error);
-      }
-    }
-  };
+  //* custom hook to fetch allUsers and Unseen messages
+  useFetchUsers();
 
-  useEffect(() => {
-    fetchAllUsers();
-  }, []);
+  //*filter
+
+  const filteredUsers = allUsers?.filter((user: user) => {
+    return user.username.toLowerCase().includes(filter.toLowerCase());
+  });
 
   return (
     <div className=" p-2 overflow-scroll h-full">
@@ -70,12 +53,14 @@ const Sidebar: React.FC = () => {
           type="text"
           className="w-full outline-none text-white"
           placeholder="Search User..."
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
         />
       </div>
       {/*Friends */}
       <aside>
         <ul className="flex flex-col gap-3">
-          {allUsers?.map((user, key: number) => {
+          {filteredUsers?.map((user, key: number) => {
             return (
               <li
                 key={key}

@@ -4,7 +4,12 @@ import {
   setLoggedInUser,
   setOnlineUsers,
 } from "../../../Store/Slices/auth-slice";
-import { setAllUsers } from "../../../Store/Slices/message-slice";
+import {
+  setAllUsers,
+  setSelectedUserMsgs,
+  setUnseenMessages,
+  setUserSelected,
+} from "../../../Store/Slices/message-slice";
 import { useContext } from "react";
 import { socketContext } from "../../../ContextForSocket/context";
 
@@ -18,6 +23,9 @@ const Navbar = () => {
     dispatch(setLoggedInUser(null));
     dispatch(setAllUsers(null));
     dispatch(setOnlineUsers([]));
+    dispatch(setUserSelected(null));
+    dispatch(setUnseenMessages({}));
+    dispatch(setSelectedUserMsgs(null));
     SocketContext?.socket?.disconnect();
     navigate("/login");
   };

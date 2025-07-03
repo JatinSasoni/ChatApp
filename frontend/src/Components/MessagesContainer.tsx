@@ -1,84 +1,34 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import assets from "../../chat-app-assets/assets";
 import { convertToLocaleFormat } from "../../Utils/LocalDateFormat";
 import type { Message } from "../../types/models";
-import type { AppDispatch, RootState } from "../../Store/store";
-import { useDispatch, useSelector } from "react-redux";
-import { api } from "../../Api/axios";
-import axios from "axios";
-import {
-  setSelectedUserMsgs,
-  setUnseenMessages,
-} from "../../Store/Slices/message-slice";
-import { socketContext } from "../../ContextForSocket/context";
+import { useSelector } from "react-redux";
+import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
+import { useListenMessage } from "../Hooks/useListenMessage";
+import type { RootState } from "../../Store/store";
 
 const MessagesContainer: React.FC = () => {
   const [input, setInput] = useState<string>("");
   const divTillScroll = useRef<HTMLInputElement>(null);
-  const dispatch = useDispatch<AppDispatch>();
-  const { userSelected, selectedUserMessages, unseenMessages } = useSelector(
+  const { userSelected, selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );
-  const { loggedInUser } = useSelector((state: RootState) => state.auth);
-  const SocketContext = useContext(socketContext);
+  const { loggedInUser, onlineUsers } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const { fetchUserMessagesHandler, sendMessage } = useFetchAndSend(); //CUSTOM HOOK
 
-  const fetchUserMessages = async () => {
-    try {
-      const response = await api.get(`/api/v1/message/${userSelected?._id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      if (response.data.success) {
-        dispatch(setSelectedUserMsgs(response?.data.selectedUserMessages));
-      }
-    } catch (error) {
-      //*Type guard
-      if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
-      } else {
-        console.log("An unexpected error occurred:", error);
-      }
-    }
-  };
-
-  //*sendMessageHandler
-  const sendMessageHandler = async () => {
-    if (input.trim() == "") return;
-    try {
-      const response = await api.post(
-        `api/v1/message/send/${userSelected?._id}`,
-        { text: input, image: "" },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
-      if (response.data.success) {
-        dispatch(
-          setSelectedUserMsgs([
-            ...(selectedUserMessages || []), //COZ TYPE OF selectedUserMessages could be of null type
-            response.data.newMessage,
-          ])
-        );
-      }
-    } catch (error) {
-      //*Type guard
-      if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
-      } else {
-        console.log("An unexpected error occurred:", error);
-      }
-    } finally {
-      setInput("");
-    }
+  //* SEND MESSAGE HANDLER
+  const sendMessageHandler = () => {
+    if (input.trim() === "") return;
+    sendMessage(input.trim(), userSelected?._id);
+    setInput("");
   };
 
   //* useEffect to fetch selected user's messages
   useEffect(() => {
     if (userSelected) {
-      fetchUserMessages();
+      fetchUserMessagesHandler(userSelected._id);
     }
   }, [userSelected]);
 
@@ -90,44 +40,9 @@ const MessagesContainer: React.FC = () => {
       });
     }
   }, [userSelected, selectedUserMessages]);
-  //* useEffect to subscribe to messages
-  useEffect(() => {
-    if (SocketContext?.socket) {
-      SocketContext.socket.on("newMessage", (newMessage: Message) => {
-        if (userSelected && userSelected._id === newMessage.senderId) {
-          dispatch(
-            setSelectedUserMsgs([
-              ...(selectedUserMessages || []),
-              { ...newMessage, seen: true },
-            ])
-          );
 
-          //call seen message  api
-        } else {
-          dispatch(
-            setUnseenMessages({
-              ...unseenMessages,
-              [newMessage.senderId]: unseenMessages[newMessage.senderId]
-                ? unseenMessages[newMessage.senderId] + 1
-                : 1,
-            })
-          );
-        }
-      });
-    }
-    return () => {
-      if (SocketContext?.socket) {
-        SocketContext.socket.off("newMessage");
-      }
-    };
-  }, [
-    SocketContext?.socket,
-    userSelected,
-    dispatch,
-    SocketContext,
-    selectedUserMessages,
-    unseenMessages,
-  ]);
+  //* custom-hook to listen/Subscribe to messages
+  useListenMessage();
 
   return (
     <section
@@ -145,12 +60,16 @@ const MessagesContainer: React.FC = () => {
               <div className="py-3 pl-3">
                 <div className="flex items-center gap-2 text-white">
                   <img
-                    src={assets.avatar_icon}
+                    src={
+                      userSelected.Profile.profilePhoto || "/avatar_icon.png"
+                    }
                     alt="Friends-avatar"
                     className="size-10"
                   />
                   <p>{userSelected?.username}</p>
-                  <div className="size-2 bg-green-400 rounded-full"></div>
+                  {onlineUsers.includes(userSelected._id) && (
+                    <div className="size-2 bg-green-400 rounded-full"></div>
+                  )}
                 </div>
               </div>
             </header>
@@ -166,40 +85,62 @@ const MessagesContainer: React.FC = () => {
                         : ""
                     }`}
                   >
-                    <div>
-                      <p className="break-all max-w-60 bg-zinc-800 text-white p-2 rounded-xl">
-                        {message.text}
-                      </p>
-                      <p
-                        className={`text-xs ${
-                          message.receiverId === "680f50e4f10f3cd28382ecf9" &&
-                          "text-end"
-                        } `}
-                      >
-                        {convertToLocaleFormat(message.createdAt)}
-                      </p>
-                    </div>
+                    {message.image ? (
+                      <div>
+                        <img
+                          src="../../../chat-app-assets/img1.jpg"
+                          className="size-40"
+                        />
+                        <p
+                          className={`text-xs ${
+                            message.senderId === loggedInUser?._id && "text-end"
+                          } `}
+                        >
+                          {convertToLocaleFormat(message.createdAt)}
+                        </p>
+                      </div>
+                    ) : (
+                      <div>
+                        <p className="break-all max-w-60 bg-zinc-800 text-white p-2 rounded-xl">
+                          {message.text}
+                        </p>
+                        <p
+                          className={`text-xs ${
+                            message.senderId === loggedInUser?._id && "text-end"
+                          } `}
+                        >
+                          {convertToLocaleFormat(message.createdAt)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 );
               })}
-
+              {/* DIV TO GET TO LATEST MESSAGES */}
               <div ref={divTillScroll}></div>
             </div>
             {/* SendMessage */}
             <div className="flex m-1">
               <input
                 type="text"
-                className="w-full rounded outline-none border border-white text-white px-2"
+                className="w-full rounded outline-none border border-white text-white pl-2"
                 placeholder="Your message... "
                 name="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
               />
-              <button
-                className="px-2 text-white bg-blue-300 rounded-sm mx-2"
-                onClick={sendMessageHandler}
-              >
-                Send
+              <label htmlFor="image" className="mx-2 grid place-items-center">
+                <img src={assets.gallery_icon} className="size-7" />
+              </label>
+              <input
+                type="file"
+                id="image"
+                accept="image/png, image/gif, image/jpeg"
+                className="hidden"
+              />
+
+              <button onClick={sendMessageHandler}>
+                <img src={assets.send_button} alt="send" className="size-8" />
               </button>
             </div>
           </div>

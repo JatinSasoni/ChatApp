@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-// import assets from "../../chat-app-assets/as";
+import { imagesDummyData } from "../../chat-app-assets/assets";
 
 const RightSidebar: React.FC = () => {
   const { userSelected } = useSelector((state: RootState) => state.message);
@@ -17,16 +17,32 @@ const RightSidebar: React.FC = () => {
         {/* PFP */}
         <div className="my-2">
           <img
-            src="../../chat-app-assets/profile_alison.png"
+            src={userSelected?.Profile.profilePhoto || "/avatar_icon.png"}
             alt="Profile_Pic"
             className="size-40 rounded-full mx-auto"
           />
-          <p className="text-2xl text-center">Jatin Sasoni</p>
-          <p className="text-sm text-center">jatin@gmail.com</p>
+          <p className="text-2xl text-center">
+            {userSelected?.username || "User"}
+          </p>
+          <p className="text-sm text-center">
+            {userSelected?.email || "unknown"}
+          </p>
         </div>
         {/* Media */}
-        <div className="p-2 border">
-          <p>Media</p>
+        <p className="font-medium">Media</p>
+        <div className="p-2 border h-80 overflow-scroll">
+          <div className="grid grid-cols-2 gap-3">
+            {imagesDummyData?.map((image: string, index: number) => {
+              return (
+                <img
+                  key={index}
+                  src={image}
+                  alt="media"
+                  className="hover:scale-105 duration-100"
+                />
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

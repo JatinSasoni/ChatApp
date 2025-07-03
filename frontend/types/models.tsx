@@ -16,6 +16,7 @@ export interface Message {
   createdAt: string;
   _id: string;
   seen: boolean;
+  image: string;
 }
 
 export interface UnseenMessages {
