@@ -25,11 +25,13 @@ export const loginController = async (req, res, next) => {
     const payload = {
       userID: user._id,
     };
+
     const token = generateToken(payload);
 
     return res.status(200).json({
       success: true,
       message: "LoggedIn",
+      loggedInUser: { ...user.toObject(), password: "" }, //toObject coz it has some hidden mongoDB fields
       token,
     });
   } catch (error) {
@@ -65,4 +67,10 @@ export const signupController = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+//CHECK AUTH
+export const checkAuth = async (req, res, next) => {
+  const user = req.user; //isAuthenticated
+  return res.status(200).json({ success: true, user });
 };

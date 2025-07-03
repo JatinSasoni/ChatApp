@@ -1,11 +1,10 @@
 import React from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../Store/store";
 // import assets from "../../chat-app-assets/as";
 
-type props = {
-  userSelected: boolean;
-};
-
-const RightSidebar: React.FC<props> = ({ userSelected }) => {
+const RightSidebar: React.FC = () => {
+  const { userSelected } = useSelector((state: RootState) => state.message);
   return (
     <section
       className={`${

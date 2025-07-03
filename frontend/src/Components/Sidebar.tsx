@@ -1,11 +1,47 @@
-import type { user } from "../../types/models";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "../../Store/store";
+import { useEffect } from "react";
+import { api } from "../../Api/axios";
+import {
+  setAllUsers,
+  setUnseenMessages,
+  setUserSelected,
+} from "../../Store/Slices/message-slice";
+import axios from "axios";
 
-type props = {
-  allUsers: user[] | null;
-  setUserSelected: React.Dispatch<React.SetStateAction<boolean>>;
-};
+const Sidebar: React.FC = () => {
+  const { onlineUsers } = useSelector((state: RootState) => state.auth);
+  const { allUsers, unseenMessages } = useSelector(
+    (state: RootState) => state.message
+  );
+  const dispatch = useDispatch();
 
-const Sidebar: React.FC<props> = ({ allUsers, setUserSelected }) => {
+  const fetchAllUsers = async () => {
+    try {
+      const response = await api.get("/api/v1/user/get-users", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        dispatch(setAllUsers(response?.data?.users || null));
+        dispatch(setUnseenMessages(response.data.unseenMessages));
+      }
+    } catch (error) {
+      //*Type guard
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data);
+      } else {
+        console.log("An unexpected error occurred:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, []);
+
   return (
     <div className=" p-2 overflow-scroll h-full">
       {/* Header */}
@@ -44,9 +80,14 @@ const Sidebar: React.FC<props> = ({ allUsers, setUserSelected }) => {
               <li
                 key={key}
                 className="cursor-pointer group"
-                onClick={() => setUserSelected((prev: boolean) => !prev)}
+                onClick={() => {
+                  dispatch(setUserSelected(user));
+                  dispatch(
+                    setUnseenMessages({ ...unseenMessages, [user._id]: 0 })
+                  );
+                }}
               >
-                <div className="flex  p-1 gap-2">
+                <div className="flex p-1 gap-3">
                   <img
                     src={
                       user?.Profile.profilePhoto ||
@@ -55,11 +96,28 @@ const Sidebar: React.FC<props> = ({ allUsers, setUserSelected }) => {
                     alt=""
                     className="size-11 rounded-full"
                   />
-                  <div className="text-white">
-                    <p className="group group-hover:scale-105 duration-300">
-                      {user.username}
-                    </p>
-                    <p className="text-xs">Offline</p>
+                  <div className="text-white flex justify-between pr-3 w-full items-center">
+                    <div>
+                      <p className="group group-hover:scale-105 duration-300">
+                        {user.username}
+                      </p>
+                      <p
+                        className={`text-xs ${
+                          onlineUsers.includes(user._id) ? "text-green-400" : ""
+                        }`}
+                      >
+                        {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                      </p>
+                    </div>
+                    <div
+                      className={`bg-green-600 rounded-full size-5 grid place-items-center ${
+                        !unseenMessages[user._id] && "hidden"
+                      }`}
+                    >
+                      <span className="text-sm ">
+                        {unseenMessages[user._id] && unseenMessages[user._id]}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </li>

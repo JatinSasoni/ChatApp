@@ -41,7 +41,7 @@ io.on("connection", (socket) => {
     delete userSocketMap[userId];
 
     //EMIT OTHERS ABOUT DISCONNECTED OR OFFLINE USER
-    io.emit("getOnlineUsers", Object, keys(userSocketMap));
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
 
@@ -69,7 +69,7 @@ app.use((err, req, res, next) => {
   return res.status(statusCode).json({
     message: message,
     success: false,
-    errors: err.errors || err.message,
+    errors: err.errors || [],
   });
 });
 

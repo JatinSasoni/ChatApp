@@ -2,27 +2,51 @@ import Sidebar from "./Sidebar";
 import MessagesContainer from "./MessagesContainer";
 import RightSidebar from "./RightSidebar";
 import Navbar from "./Shared/Navbar";
-import { useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { api } from "../../Api/axios";
 import axios from "axios";
-import type { user } from "../../types/models";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setLoggedInUser,
+  setOnlineUsers,
+  setSocketId,
+} from "../../Store/Slices/auth-slice";
+import { connectToSocket } from "../../Utils/createSocketConnection";
+import type { RootState } from "../../Store/store";
+import { socketContext } from "../../ContextForSocket/context";
 
 const Home: React.FC = () => {
-  const [userSelected, setUserSelected] = useState<boolean>(false);
-  const [allUsers, setAllUsers] = useState<user[] | null>(null);
+  const dispatch = useDispatch();
 
-  const fetchOnlineUsers = async () => {
+  const { loggedInUser } = useSelector((state: RootState) => state.auth);
+  const { userSelected } = useSelector((state: RootState) => state.message);
+  const SocketContext = useContext(socketContext);
+
+  const checkAuth = async () => {
     try {
-      const response = await api.get("/api/v1/user/get-users", {
+      const response = await api.get("/api/v1/auth/check", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         withCredentials: true,
       });
       if (response.data.success) {
-        setAllUsers(response.data.users);
+        //*If Authentication successful Update store
+        dispatch(setLoggedInUser(response.data.user));
+        const newSocket = connectToSocket(response.data.user) || null;
+        if (newSocket) {
+          dispatch(setSocketId(newSocket?.id || null));
+          newSocket?.on("getOnlineUsers", (userIds: string[]) => {
+            dispatch(setOnlineUsers(userIds));
+          });
+          SocketContext?.setSocket(newSocket || null);
+          newSocket?.on("getOnlineUsers", (userIds: string[]) => {
+            dispatch(setOnlineUsers(userIds));
+          });
+        }
       }
     } catch (error) {
+      //*Type guard
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data);
       } else {
@@ -32,8 +56,10 @@ const Home: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchOnlineUsers();
-  }, []);
+    if (!loggedInUser) {
+      checkAuth();
+    }
+  }, [loggedInUser]);
 
   return (
     <section>
@@ -44,12 +70,9 @@ const Home: React.FC = () => {
             userSelected ? "grid-cols-4 gap-3" : "grid-cols-2"
           }`}
         >
-          <Sidebar allUsers={allUsers} setUserSelected={setUserSelected} />
-          <MessagesContainer
-            userSelected={userSelected}
-            setUserSelected={setUserSelected}
-          />
-          <RightSidebar userSelected={userSelected} />
+          <Sidebar />
+          <MessagesContainer />
+          <RightSidebar />
         </div>
       </main>
     </section>

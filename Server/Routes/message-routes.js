@@ -10,7 +10,9 @@ const messageRouter = Router();
 
 //GET SELECTED USER MESSAGES
 messageRouter.get("/:id", isAuthenticated, getSelectedUser);
+//MARK MESSAGE AS SEEN
 messageRouter.put("/mark/:messageId", isAuthenticated, markMessagesSeen);
+//SEND MESSAGE
 messageRouter.post("/send/:id", isAuthenticated, sendMessage);
 
 export default messageRouter;

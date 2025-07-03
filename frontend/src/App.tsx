@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./Components/Home";
 import Signup from "./Pages/Signup";
 import Login from "./Pages/Login";
+import ProtectRoute from "./ProtectRoutes/ProtectRoute";
 
 const Router = createBrowserRouter([
   {
@@ -10,15 +11,24 @@ const Router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <ProtectRoute>
+        <Login />
+      </ProtectRoute>
+    ),
   },
   {
     path: "/signup",
-    element: <Signup />,
+
+    element: (
+      <ProtectRoute>
+        <Signup />
+      </ProtectRoute>
+    ),
   },
 ]);
 
-const App = () => {
+const App: React.FC = () => {
   return <RouterProvider router={Router}></RouterProvider>;
 };
 

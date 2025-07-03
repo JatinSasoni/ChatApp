@@ -11,14 +11,14 @@ export const getAllUsers = async (req, res, next) => {
   const filteredUser = await UserModel.find({ _id: { $ne: user._id } });
   const unseenMessages = {};
   const promises = filteredUser.map(async (otherUser) => {
-    const message = await MessageModel.find({
+    const messages = await MessageModel.find({
       senderId: otherUser._id,
       receiverId: user._id,
       seen: false,
     });
 
-    if (message.length > 0) {
-      unseenMessages[otherUser._id] = message.length;
+    if (messages.length > 0) {
+      unseenMessages[otherUser._id] = messages.length;
     }
   });
   await Promise.all(promises);
@@ -38,7 +38,7 @@ export const getSelectedUser = async (req, res, next) => {
     const selectedUserMessages = await MessageModel.find({
       $or: [
         { senderId: userId, receiverId: selectedUserId },
-        { senderId: receiverId, receiverId: userId },
+        { senderId: selectedUserId, receiverId: userId },
       ],
     });
     //MARK MESSAGES SEEN

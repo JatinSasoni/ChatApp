@@ -2,8 +2,15 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { api } from "../../Api/axios";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-// type Props = {};
+import { useDispatch } from "react-redux";
+import {
+  setLoggedInUser,
+  setOnlineUsers,
+  setSocketId,
+} from "../../Store/Slices/auth-slice";
+import { connectToSocket } from "../../Utils/createSocketConnection";
+import { useContext } from "react";
+import { socketContext } from "../../ContextForSocket/context";
 
 type Inputs = {
   email: string;
@@ -12,6 +19,9 @@ type Inputs = {
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const SocketContext = useContext(socketContext);
+
   const {
     register,
     handleSubmit,
@@ -22,7 +32,14 @@ const Login = () => {
     try {
       const response = await api.post("/api/v1/auth/login", data);
       if (response.data.success) {
-        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("token", response.data?.token);
+        dispatch(setLoggedInUser(response?.data?.loggedInUser));
+        const newSocket = connectToSocket(response.data.loggedInUser);
+        dispatch(setSocketId(newSocket?.id || null));
+        SocketContext?.setSocket(newSocket || null);
+        newSocket?.on("getOnlineUsers", (userIds: string[]) => {
+          dispatch(setOnlineUsers(userIds));
+        });
         navigate("/");
       }
     } catch (error) {
