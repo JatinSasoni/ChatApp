@@ -32,10 +32,10 @@ const Sidebar: React.FC = () => {
         <p className="text-2xl text-white">Public Chats</p>
         <div className="relative group">
           <img
-            src="../assets/menu_icon.png"
-            alt=""
+            src="../../src/assets/menu_icon.png"
+            alt="menu"
             width="30"
-            className="cursor-pointer"
+            className="cursor-pointer "
           />
           <div className="absolute group hidden group-hover:block border-white border right-5 p-2 w-30 backdrop-blur-md">
             <button className="text-white px-2 hover:scale-105 ">
@@ -48,7 +48,7 @@ const Sidebar: React.FC = () => {
       </div>
       {/* Search Contact */}
       <div className="flex gap-2 bg-blue-950 rounded-xl items-center px-2 my-3 py-1 ">
-        <img src="../assets/search_icon.png" alt="" className="size-3" />
+        <img src="../../src/assets/search_icon.png" alt="" className="size-3" />
         <input
           type="text"
           className="w-full outline-none text-white"
@@ -74,10 +74,7 @@ const Sidebar: React.FC = () => {
               >
                 <div className="flex p-1 gap-3">
                   <img
-                    src={
-                      user?.Profile.profilePhoto ||
-                      "../../chat-app-assets/profile_alison.png"
-                    }
+                    src={user?.Profile.profilePhoto || "/avatar_icon.png"}
                     alt=""
                     className="size-11 rounded-full"
                   />

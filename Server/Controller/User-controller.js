@@ -1,6 +1,6 @@
 import { MessageModel } from "../Model/Message-mode.js";
 import { UserModel } from "../Model/User-model.js";
-import cloudinary from "../utils/cloudinary.js";
+import cloudinary, { uploadToCloudinary } from "../utils/cloudinary.js";
 import { io, userSocketMap } from "../server.js";
 
 //GET ALL USERS AND UNSEEN MESSAGES
@@ -76,18 +76,14 @@ export const sendMessage = async (req, res, next) => {
     const senderId = req.user._id;
 
     let imageURL;
-    if (image) {
-      //cloudinary
-      const uploadResponse = await cloudinary.uploader.upload(image, {
-        folder: "/chat-test",
-      });
-      imageURL = uploadResponse.secure_url;
+    if (image && image.startsWith("data:image/")) {
+      imageURL = await uploadToCloudinary(image, "/chat-test");
     }
 
     const newMessage = await MessageModel.create({
       senderId,
       receiverId,
-      text,
+      text: text || "",
       image: imageURL,
     });
 

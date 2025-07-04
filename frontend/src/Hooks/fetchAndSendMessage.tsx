@@ -10,7 +10,7 @@ export const useFetchAndSend = () => {
     (state: RootState) => state.message
   );
 
-  //*Fetching user messages
+  //*Fetching user messages and images
   const fetchUserMessagesHandler = async (selectedUserId: string) => {
     try {
       const response = await api.get(`/api/v1/message/${selectedUserId}`, {
@@ -34,12 +34,14 @@ export const useFetchAndSend = () => {
   //*sendMessageHandler
   const sendMessage = async (
     input: string,
-    selectedUserId: string | undefined
+    selectedUserId: string | undefined,
+    image?: string | ArrayBuffer | null
   ) => {
+    if (!input && !image) return;
     try {
       const response = await api.post(
         `api/v1/message/send/${selectedUserId}`,
-        { text: input, image: "" },
+        { text: input, image: image },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

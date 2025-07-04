@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { imagesDummyData } from "../../chat-app-assets/assets";
 
 const RightSidebar: React.FC = () => {
-  const { userSelected } = useSelector((state: RootState) => state.message);
+  const { userSelected, selectedUserMessages } = useSelector(
+    (state: RootState) => state.message
+  );
+  const [msgImages, setMsgImages] = useState<string[] | undefined | null>([]);
+
+  useEffect(() => {
+    setMsgImages(() =>
+      selectedUserMessages?.filter((msg) => msg.image).map((msg) => msg.image)
+    );
+  }, [userSelected, selectedUserMessages]);
   return (
     <section
       className={`${
@@ -32,13 +40,14 @@ const RightSidebar: React.FC = () => {
         <p className="font-medium">Media</p>
         <div className="p-2 border h-80 overflow-scroll">
           <div className="grid grid-cols-2 gap-3">
-            {imagesDummyData?.map((image: string, index: number) => {
+            {msgImages?.map((image: string, index: number) => {
               return (
                 <img
                   key={index}
                   src={image}
                   alt="media"
                   className="hover:scale-105 duration-100"
+                  onClick={() => window.open(image)}
                 />
               );
             })}

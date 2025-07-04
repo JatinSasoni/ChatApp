@@ -1,4 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
+import { configDotenv } from "dotenv";
+
+configDotenv();
 
 //CLOUDINARY SETUP
 cloudinary.config({
@@ -11,10 +14,10 @@ cloudinary.config({
 export const uploadToCloudinary = async (file, folder) => {
   try {
     if (!file) return null;
-    // const fileURI = getDataURI(file);
-    const uploadResponse = await cloudinary.uploader.upload(fileURI.content, {
+    const uploadResponse = await cloudinary.uploader.upload(file, {
       folder: folder,
     });
+
     return uploadResponse.secure_url;
   } catch (error) {
     console.error(`Cloudinary Upload Error (${folder}):`, error);

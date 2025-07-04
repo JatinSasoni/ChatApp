@@ -1,29 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import assets from "../../chat-app-assets/assets";
-import { convertToLocaleFormat } from "../../Utils/LocalDateFormat";
 import type { Message } from "../../types/models";
 import { useSelector } from "react-redux";
 import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
 import { useListenMessage } from "../Hooks/useListenMessage";
 import type { RootState } from "../../Store/store";
+import SendMessageBox from "./SendMessageBox";
+import MessageBox from "./MessageBox";
 
 const MessagesContainer: React.FC = () => {
-  const [input, setInput] = useState<string>("");
+  const [uploading, setUploading] = useState<boolean>(false);
   const divTillScroll = useRef<HTMLInputElement>(null);
   const { userSelected, selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );
-  const { loggedInUser, onlineUsers } = useSelector(
-    (state: RootState) => state.auth
-  );
-  const { fetchUserMessagesHandler, sendMessage } = useFetchAndSend(); //CUSTOM HOOK
-
-  //* SEND MESSAGE HANDLER
-  const sendMessageHandler = () => {
-    if (input.trim() === "") return;
-    sendMessage(input.trim(), userSelected?._id);
-    setInput("");
-  };
+  const { onlineUsers } = useSelector((state: RootState) => state.auth);
+  const { fetchUserMessagesHandler } = useFetchAndSend(); //CUSTOM HOOK
 
   //* useEffect to fetch selected user's messages
   useEffect(() => {
@@ -39,7 +30,7 @@ const MessagesContainer: React.FC = () => {
         behavior: "smooth",
       });
     }
-  }, [userSelected, selectedUserMessages]);
+  }, [userSelected, selectedUserMessages, uploading]);
 
   //* custom-hook to listen/Subscribe to messages
   useListenMessage();
@@ -52,7 +43,6 @@ const MessagesContainer: React.FC = () => {
     >
       {userSelected ? (
         <div className="shadow-2xl rounded ">
-          {/*user-info */}
           {/* Main container */}
           <div className="flex flex-col ">
             {/* header */}
@@ -76,77 +66,26 @@ const MessagesContainer: React.FC = () => {
             {/* Scrollable messages container */}
             <div className="overflow-y-scroll text-white h-[500px]  ">
               {selectedUserMessages?.map((message: Message, i: number) => {
-                return (
-                  <div
-                    key={i}
-                    className={`m-2 py-1 flex ${
-                      message.senderId === loggedInUser?._id
-                        ? "flex-row-reverse"
-                        : ""
-                    }`}
-                  >
-                    {message.image ? (
-                      <div>
-                        <img
-                          src="../../../chat-app-assets/img1.jpg"
-                          className="size-40"
-                        />
-                        <p
-                          className={`text-xs ${
-                            message.senderId === loggedInUser?._id && "text-end"
-                          } `}
-                        >
-                          {convertToLocaleFormat(message.createdAt)}
-                        </p>
-                      </div>
-                    ) : (
-                      <div>
-                        <p className="break-all max-w-60 bg-zinc-800 text-white p-2 rounded-xl">
-                          {message.text}
-                        </p>
-                        <p
-                          className={`text-xs ${
-                            message.senderId === loggedInUser?._id && "text-end"
-                          } `}
-                        >
-                          {convertToLocaleFormat(message.createdAt)}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
+                return <MessageBox message={message} key={i} />;
               })}
+              {uploading && (
+                <div className="text-sm  m-2 text-center text-white">
+                  sending image...
+                </div>
+              )}
               {/* DIV TO GET TO LATEST MESSAGES */}
               <div ref={divTillScroll}></div>
             </div>
             {/* SendMessage */}
-            <div className="flex m-1">
-              <input
-                type="text"
-                className="w-full rounded outline-none border border-white text-white pl-2"
-                placeholder="Your message... "
-                name="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-              <label htmlFor="image" className="mx-2 grid place-items-center">
-                <img src={assets.gallery_icon} className="size-7" />
-              </label>
-              <input
-                type="file"
-                id="image"
-                accept="image/png, image/gif, image/jpeg"
-                className="hidden"
-              />
-
-              <button onClick={sendMessageHandler}>
-                <img src={assets.send_button} alt="send" className="size-8" />
-              </button>
-            </div>
+            <SendMessageBox setUploading={setUploading} uploading={uploading} />
           </div>
         </div>
       ) : (
-        <img src={assets.logo_big} alt="logo" className="w-2/3 " />
+        <img
+          src="../../src/assets/logo_big.svg"
+          alt="logo"
+          className="w-2/3 "
+        />
       )}
     </section>
   );

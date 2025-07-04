@@ -10,41 +10,51 @@ import {
 import { connectToSocket } from "../../Utils/createSocketConnection";
 import { socketContext } from "../../ContextForSocket/context";
 import axios from "axios";
+import { Navigate, useNavigate } from "react-router-dom";
 
 export const useCheckAuth = () => {
+  const navigate = useNavigate();
   const { loggedInUser } = useSelector((state: RootState) => state.auth);
-
   const SocketContext = useContext(socketContext);
   const dispatch = useDispatch();
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+          return;
+        }
+
         const response = await api.get("/api/v1/auth/check", {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
           },
           withCredentials: true,
         });
+
         if (response.data.success) {
           //*If Authentication successful Update store
           dispatch(setLoggedInUser(response.data.user));
+
           const newSocket = connectToSocket(response.data.user) || null;
           if (newSocket) {
             dispatch(setSocketId(newSocket?.id || null));
+
             newSocket?.on("getOnlineUsers", (userIds: string[]) => {
               dispatch(setOnlineUsers(userIds));
             });
             SocketContext?.setSocket(newSocket || null);
-            newSocket?.on("getOnlineUsers", (userIds: string[]) => {
-              dispatch(setOnlineUsers(userIds));
-            });
           }
+        } else {
+          navigate("login");
         }
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
           console.log(error.response?.data);
+          navigate("login");
         } else {
           console.log("An unexpected error occurred:", error);
         }

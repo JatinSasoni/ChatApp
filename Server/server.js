@@ -52,8 +52,8 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
-app.use(urlencoded({ extended: true }));
+app.use(express.json({ limit: "4mb" })); //DEFAULT IS 100KB
+app.use(urlencoded({ extended: true, limit: "4mb" }));
 
 //ROUTES
 app.use(express.static("./public"));
@@ -74,6 +74,7 @@ app.use((err, req, res, next) => {
 });
 
 //PORT
+
 const PORT = process.env.PORT || 7000;
 
 //Listen
