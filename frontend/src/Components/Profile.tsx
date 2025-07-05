@@ -2,7 +2,6 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import { useCheckAuth } from "../Hooks/checkAuth";
 import Navbar from "./Shared/Navbar";
-import Sidebar from "./Sidebar";
 import { useState } from "react";
 import UpdateProfile from "./UpdateProfile";
 
@@ -11,14 +10,14 @@ const Profile = () => {
   const [setUpdate, setIsUpdate] = useState<boolean>(false);
   useCheckAuth();
   return (
-    <section className="flex min-h-screen bg-gray-50  text-gray-800 ">
+    <section className="sm:flex h-screen bg-gray-50  text-gray-800 ">
       {/* Sidebar and Navbar */}
       <Navbar />
 
       {/* Main Content */}
-      <main className="flex-1 relative p-6 overflow-y-auto shadow-md">
+      <main className="flex-1 relative p-6 overflow-y-auto shadow-md max-sm:h-[calc(100vh-50px)]  ">
         {/* Edit Button */}
-        <div className="absolute top-6 right-6 z-10">
+        <div className="absolute top-6 right-6 ">
           <button
             className="bg-white  text-blue-500 px-4 py-2 rounded-md text-sm font-medium shadow hover:bg-gray-100"
             onClick={() => setIsUpdate((prev) => !prev)}
@@ -62,7 +61,7 @@ const Profile = () => {
 
         {/* Update Modal Overlay */}
         {setUpdate && (
-          <div className="absolute top-0 left-0 bottom-0 right-0">
+          <div className="absolute top-0 left-0 bottom-0 right-0 ">
             <UpdateProfile setIsUpdate={setIsUpdate} />
           </div>
         )}

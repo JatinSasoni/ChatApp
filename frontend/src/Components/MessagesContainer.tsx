@@ -8,6 +8,7 @@ import SendMessageBox from "./SendMessageBox";
 import { IoArrowBackSharp } from "react-icons/io5";
 import MessageBox from "./MessageBox";
 import { setUserSelected } from "../../Store/Slices/message-slice";
+import RightSidebar from "./RightSidebar";
 
 const MessagesContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -40,16 +41,18 @@ const MessagesContainer: React.FC = () => {
 
   return (
     <section
-      className={`${
-        userSelected ? "min-w-4xl" : "place-items-center w-full "
+      className={`max-sm:h-[calc(100vh)] shadow-lg sm:mx-2 ${
+        userSelected
+          ? "sm:min-w-4xl"
+          : "place-items-center w-full max-sm:hidden "
       }  `}
     >
       {userSelected ? (
-        <div className=" rounded h-full ">
+        <div className="max-sm:h-full rounded sm:h-full ">
           {/* Main container */}
-          <div className="flex flex-col">
+          <div className="max-sm:h-full flex flex-col">
             {/* header */}
-            <header className="sticky top-0  shadow-md z-10">
+            <header className="sticky top-0 shadow-md z-10">
               <div className="py-3 pl-3 flex justify-between">
                 <div className="flex items-center gap-2 ">
                   <img
@@ -71,7 +74,7 @@ const MessagesContainer: React.FC = () => {
               </div>
             </header>
             {/* Scrollable messages container */}
-            <div className="overflow-y-scroll h-[580px] bg-neutral-100 rounded-md">
+            <div className="overflow-y-scroll max-sm:h-[calc(100vh-60px)] sm:h-[580px] bg-neutral-100 rounded-md">
               {selectedUserMessages?.map((message: Message, i: number) => {
                 return <MessageBox message={message} key={i} />;
               })}
@@ -88,7 +91,7 @@ const MessagesContainer: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="h-full w-full p-2 grid place-items-center bg-slate-50">
+        <div className="max-sm:hidden sm:h-full sm:w-full p-2 grid place-items-center bg-slate-50">
           <img
             src="../../src/assets/logo_big.svg"
             alt="logo"

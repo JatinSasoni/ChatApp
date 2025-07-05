@@ -12,7 +12,7 @@ import type { user } from "../../types/models";
 const Sidebar: React.FC = () => {
   const { onlineUsers } = useSelector((state: RootState) => state.auth);
   const [filter, setFilter] = useState<string>("");
-  const { allUsers, unseenMessages } = useSelector(
+  const { allUsers, unseenMessages, userSelected } = useSelector(
     (state: RootState) => state.message
   );
   const dispatch = useDispatch();
@@ -28,7 +28,9 @@ const Sidebar: React.FC = () => {
 
   return (
     <div
-      className={` p-2 min-w-70 overflow-y-scroll h-screen drop-shadow-md shadow-md duration-300`}
+      className={`${
+        userSelected && "max-sm:hidden"
+      } p-2 min-w-70 overflow-y-scroll max-sm:h-[calc(100vh-56px)] sm:h-screen drop-shadow-md shadow-md duration-300`}
     >
       {/* Header */}
 

@@ -10,7 +10,7 @@ const Home: React.FC = () => {
 
   return (
     <section>
-      <main className="h-screen  w-screen flex">
+      <main className="h-screen w-screen sm:flex">
         <Navbar />
         <Sidebar />
         <MessagesContainer />

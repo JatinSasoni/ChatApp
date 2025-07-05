@@ -17,7 +17,7 @@ const RightSidebar: React.FC = () => {
   }, [userSelected, selectedUserMessages]);
   return (
     <section
-      className={`w-full ml-2 ${
+      className={`w-full max-sm:hidden ml-2 ${
         userSelected ? "block" : "hidden"
       }  p-2 rounded-xl shadow`}
     >
