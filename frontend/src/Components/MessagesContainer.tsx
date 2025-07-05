@@ -1,13 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { Message } from "../../types/models";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
 import { useListenMessage } from "../Hooks/useListenMessage";
 import type { RootState } from "../../Store/store";
 import SendMessageBox from "./SendMessageBox";
+import { IoArrowBackSharp } from "react-icons/io5";
 import MessageBox from "./MessageBox";
+import { setUserSelected } from "../../Store/Slices/message-slice";
 
 const MessagesContainer: React.FC = () => {
+  const dispatch = useDispatch();
   const [uploading, setUploading] = useState<boolean>(false);
   const divTillScroll = useRef<HTMLInputElement>(null);
   const { userSelected, selectedUserMessages } = useSelector(
@@ -37,39 +40,43 @@ const MessagesContainer: React.FC = () => {
 
   return (
     <section
-      className={`grid ${
-        userSelected ? "col-span-2" : "place-items-center "
+      className={`${
+        userSelected ? "min-w-4xl" : "place-items-center w-full "
       }  `}
     >
       {userSelected ? (
-        <div className="shadow-2xl rounded ">
+        <div className=" rounded h-full ">
           {/* Main container */}
-          <div className="flex flex-col ">
+          <div className="flex flex-col">
             {/* header */}
-            <header className="sticky top-0 bg-zinc-700 z-10">
-              <div className="py-3 pl-3">
-                <div className="flex items-center gap-2 text-white">
+            <header className="sticky top-0  shadow-md z-10">
+              <div className="py-3 pl-3 flex justify-between">
+                <div className="flex items-center gap-2 ">
                   <img
                     src={
                       userSelected.Profile.profilePhoto || "/avatar_icon.png"
                     }
                     alt="Friends-avatar"
-                    className="size-10"
+                    className="size-10 rounded-full"
                   />
                   <p>{userSelected?.username}</p>
                   {onlineUsers.includes(userSelected._id) && (
                     <div className="size-2 bg-green-400 rounded-full"></div>
                   )}
                 </div>
+                <IoArrowBackSharp
+                  onClick={() => dispatch(setUserSelected(null))}
+                  className="my-auto mr-6 size-6 hover:scale-105 duration-200"
+                />
               </div>
             </header>
             {/* Scrollable messages container */}
-            <div className="overflow-y-scroll text-white h-[500px]  ">
+            <div className="overflow-y-scroll h-[580px] bg-neutral-100 rounded-md">
               {selectedUserMessages?.map((message: Message, i: number) => {
                 return <MessageBox message={message} key={i} />;
               })}
               {uploading && (
-                <div className="text-sm  m-2 text-center text-white">
+                <div className="text-sm  m-2 text-center ">
                   sending image...
                 </div>
               )}
@@ -81,11 +88,13 @@ const MessagesContainer: React.FC = () => {
           </div>
         </div>
       ) : (
-        <img
-          src="../../src/assets/logo_big.svg"
-          alt="logo"
-          className="w-2/3 "
-        />
+        <div className="h-full w-full p-2 grid place-items-center bg-slate-50">
+          <img
+            src="../../src/assets/logo_big.svg"
+            alt="logo"
+            className="w-2/5 drop-shadow-xl "
+          />
+        </div>
       )}
     </section>
   );

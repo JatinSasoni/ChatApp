@@ -6,7 +6,9 @@ const RightSidebar: React.FC = () => {
   const { userSelected, selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );
-  const [msgImages, setMsgImages] = useState<string[] | undefined | null>([]);
+  const [msgImages, setMsgImages] = useState<string[] | undefined>([]);
+  console.log(userSelected);
+  console.log(msgImages);
 
   useEffect(() => {
     setMsgImages(() =>
@@ -15,21 +17,25 @@ const RightSidebar: React.FC = () => {
   }, [userSelected, selectedUserMessages]);
   return (
     <section
-      className={`${
+      className={`w-full ml-2 ${
         userSelected ? "block" : "hidden"
-      } text-white border p-2 rounded-xl shadow-2xl bg-blue-950`}
+      }  p-2 rounded-xl shadow`}
     >
       {/* container */}
-      <div className=" h-full">
-        <p className="text-white text-xl">Profile</p>
+      <div className="h-full">
+        <p className="text-xl">Profile</p>
         {/* PFP */}
         <div className="my-2">
           <img
             src={userSelected?.Profile.profilePhoto || "/avatar_icon.png"}
             alt="Profile_Pic"
-            className="size-40 rounded-full mx-auto"
+            className="size-40 rounded-full mx-auto cursor-pointer"
+            onClick={() =>
+              userSelected?.Profile.profilePhoto &&
+              window.open(userSelected?.Profile?.profilePhoto)
+            }
           />
-          <p className="text-2xl text-center">
+          <p className="text-2xl mt-2 text-center">
             {userSelected?.username || "User"}
           </p>
           <p className="text-sm text-center">
@@ -38,19 +44,23 @@ const RightSidebar: React.FC = () => {
         </div>
         {/* Media */}
         <p className="font-medium">Media</p>
-        <div className="p-2 border h-80 overflow-scroll">
+        <div className="p-2 rounded-md h-96 overflow-scroll shadow">
           <div className="grid grid-cols-2 gap-3">
-            {msgImages?.map((image: string, index: number) => {
-              return (
-                <img
-                  key={index}
-                  src={image}
-                  alt="media"
-                  className="hover:scale-105 duration-100"
-                  onClick={() => window.open(image)}
-                />
-              );
-            })}
+            {msgImages && msgImages?.length > 0 ? (
+              msgImages?.map((image: string, index: number) => {
+                return (
+                  <img
+                    key={index}
+                    src={image}
+                    alt="media"
+                    className="hover:scale-105 duration-100"
+                    onClick={() => window.open(image)}
+                  />
+                );
+              })
+            ) : (
+              <span>No media </span>
+            )}
           </div>
         </div>
       </div>

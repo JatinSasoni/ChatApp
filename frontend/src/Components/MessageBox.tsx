@@ -12,7 +12,7 @@ const MessageBox: React.FC<Props> = ({ message }) => {
   const { loggedInUser } = useSelector((state: RootState) => state.auth);
   return (
     <div
-      className={`m-2 py-1 flex ${
+      className={`m-2  flex ${
         message.senderId === loggedInUser?._id ? "flex-row-reverse" : ""
       }`}
     >
@@ -20,7 +20,7 @@ const MessageBox: React.FC<Props> = ({ message }) => {
         <div>
           <img
             src={message.image}
-            className="size-40 hover:translate-x-0.5 duration-300"
+            className="size-42 hover:translate-x-0.5 duration-300 rounded-xl"
             onClick={() => window.open(message.image)}
           />
           <p
@@ -35,7 +35,13 @@ const MessageBox: React.FC<Props> = ({ message }) => {
 
       {message.text && (
         <div>
-          <p className="break-all max-w-60 bg-zinc-800 text-white p-2 rounded-xl">
+          <p
+            className={`break-all max-w-60 p-2 rounded-xl text-md ${
+              message.senderId === loggedInUser?._id
+                ? "bg-purple-600 text-white rounded-br-none"
+                : "text-black bg-zinc-300 rounded-bl-none"
+            }`}
+          >
             {message.text}
           </p>
           <p

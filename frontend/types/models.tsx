@@ -3,6 +3,7 @@ export interface user {
   email: string;
   Profile: {
     profilePhoto: string;
+    bio: string;
   };
   createdAt: string;
   updatedAt: string;

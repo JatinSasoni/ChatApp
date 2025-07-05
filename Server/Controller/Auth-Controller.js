@@ -13,7 +13,7 @@ export const loginController = async (req, res, next) => {
       throw error;
     }
 
-    const isPassMatched = bcrypt.compareSync(password, user.password);
+    const isPassMatched = await bcrypt.compare(password, user.password);
 
     if (!isPassMatched) {
       const error = new Error("Invalid credentials");
@@ -30,7 +30,7 @@ export const loginController = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "LoggedIn",
+      message: `Welcome ${user.username || "user"}`,
       loggedInUser: { ...user.toObject(), password: "" }, //toObject coz it has some hidden mongoDB fields
       token,
     });
@@ -54,15 +54,14 @@ export const signupController = async (req, res, next) => {
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = bcrypt.hashSync(password, salt);
-    const createdUser = await UserModel.create({
+    await UserModel.create({
       email,
       password: hashedPassword,
       username,
     });
     return res.status(201).json({
       success: true,
-      createdUser,
-      message: "User created",
+      message: "Signup successful",
     });
   } catch (error) {
     next(error);

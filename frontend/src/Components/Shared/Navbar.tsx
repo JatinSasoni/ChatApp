@@ -1,5 +1,6 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { CiChat1, CiUser, CiHome, CiLogout } from "react-icons/ci";
 import {
   setLoggedInUser,
   setOnlineUsers,
@@ -13,7 +14,7 @@ import {
 import { useContext } from "react";
 import { socketContext } from "../../../ContextForSocket/context";
 
-const Navbar = () => {
+const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const SocketContext = useContext(socketContext);
@@ -31,25 +32,40 @@ const Navbar = () => {
   };
 
   return (
-    <header className="my-2 text-white p-2">
-      <div className="flex justify-around items-center">
-        <div className="flex gap-2 items-center">
+    <header className="min-w-20 h-screen">
+      <div className="flex flex-col gap-4  px-2 pt-2 h-full">
+        <div className="flex gap-2 justify-center ">
           <img
             src="../../../public/favicon.svg"
             alt="Logo"
             width="40"
             height="20"
           />
-          <p className="font-semibold">QuickChat</p>
         </div>
-        <nav>
-          <ul className="flex gap-8 p-2 cursor-pointer font-medium">
-            <li onClick={() => navigate("/")}>Home</li>
-            <li onClick={logoutHandler}>Logout</li>
-            <li onClick={() => navigate("/login")}>Login</li>
-            <li onClick={() => navigate("/signup")}>Signup</li>
-            <li onClick={() => navigate("/Profile")}>Profile</li>
+        <nav className="flex flex-col justify-between h-full">
+          <ul className="flex flex-col gap-10 p-2 cursor-pointer font-medium items-center">
+            <li>
+              <CiHome
+                className="size-6 hover:scale-105 duration-300 "
+                onClick={() => {
+                  dispatch(setUserSelected(null));
+                  navigate("/");
+                }}
+              />
+            </li>
+            <li>
+              <CiUser
+                className="size-6 hover:scale-105 duration-300 "
+                onClick={() => navigate("/profile")}
+              />
+            </li>
           </ul>
+          <div className="flex flex-col mb-4 items-center">
+            <CiLogout
+              className="size-6  hover:scale-105 duration-300 "
+              onClick={logoutHandler}
+            />
+          </div>
         </nav>
       </div>
     </header>

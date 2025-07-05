@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
+import { CiSearch } from "react-icons/ci";
 import {
   setUnseenMessages,
   setUserSelected,
@@ -26,32 +27,18 @@ const Sidebar: React.FC = () => {
   });
 
   return (
-    <div className=" p-2 overflow-scroll h-full">
+    <div
+      className={` p-2 min-w-70 overflow-y-scroll h-screen drop-shadow-md shadow-md duration-300`}
+    >
       {/* Header */}
-      <div className="flex justify-between">
-        <p className="text-2xl text-white">Public Chats</p>
-        <div className="relative group">
-          <img
-            src="../../src/assets/menu_icon.png"
-            alt="menu"
-            width="30"
-            className="cursor-pointer "
-          />
-          <div className="absolute group hidden group-hover:block border-white border right-5 p-2 w-30 backdrop-blur-md">
-            <button className="text-white px-2 hover:scale-105 ">
-              Edit Profile
-            </button>
-            <hr className="text-white" />
-            <button className="text-white px-2 hover:scale-105">Logout</button>
-          </div>
-        </div>
-      </div>
+
+      <h2 className="text-2xl">Messages</h2>
       {/* Search Contact */}
-      <div className="flex gap-2 bg-blue-950 rounded-xl items-center px-2 my-3 py-1 ">
-        <img src="../../src/assets/search_icon.png" alt="" className="size-3" />
+      <div className="flex gap-2 bg-slate-100  rounded-xl items-center px-2 my-3 py-1 ">
+        <CiSearch />
         <input
           type="text"
-          className="w-full outline-none text-white"
+          className="w-full outline-none"
           placeholder="Search User..."
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -59,7 +46,7 @@ const Sidebar: React.FC = () => {
       </div>
       {/*Friends */}
       <aside>
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-3 ">
           {filteredUsers?.map((user, key: number) => {
             return (
               <li
@@ -78,25 +65,25 @@ const Sidebar: React.FC = () => {
                     alt=""
                     className="size-11 rounded-full"
                   />
-                  <div className="text-white flex justify-between pr-3 w-full items-center">
+                  <div className=" flex justify-between pr-3 w-full items-center">
                     <div>
                       <p className="group group-hover:scale-105 duration-300">
                         {user.username}
                       </p>
                       <p
                         className={`text-xs ${
-                          onlineUsers.includes(user._id) ? "text-green-400" : ""
+                          onlineUsers.includes(user._id) ? "text-green-500" : ""
                         }`}
                       >
                         {onlineUsers.includes(user._id) ? "Online" : "Offline"}
                       </p>
                     </div>
                     <div
-                      className={`bg-green-600 rounded-full size-5 grid place-items-center ${
+                      className={`bg-purple-300 rounded-full size-5 grid place-items-center ${
                         !unseenMessages[user._id] && "hidden"
                       }`}
                     >
-                      <span className="text-sm ">
+                      <span className="text-sm">
                         {unseenMessages[user._id] && unseenMessages[user._id]}
                       </span>
                     </div>

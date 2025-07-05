@@ -56,6 +56,45 @@ export const getSelectedUser = async (req, res, next) => {
   }
 };
 
+//HANDLING USER PROFILE UPDATE
+export const updateProfile = async (req, res) => {
+  try {
+    const { username, bio, profilePhoto } = req.body;
+
+    const userID = req.user._id; //FROM MIDDLEWARE AUTHENTICATION
+    let user = await UserModel.findById(userID).select("-password"); //FETCHING USER DATA FROM DATABASE
+    if (!user) {
+      const error = new Error("User not found");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    //UPDATING DATA
+    if (username) user.username = username;
+    if (bio) user.Profile.bio = bio;
+    if (profilePhoto) {
+      const imageURL = await uploadToCloudinary(
+        profilePhoto,
+        "/chat-test/profilePhoto"
+      );
+      user.Profile.profilePhoto = imageURL;
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user,
+      success: true,
+    });
+  } catch (error) {
+    console.log("ERROR WHILE UPDATING PROFILE");
+    console.log(error);
+
+    next(error);
+  }
+};
+
 //API TO MARK MESSAGES SEEN USING MESSAGE-ID
 export const markMessagesSeen = async (req, res, next) => {
   try {

@@ -10,7 +10,7 @@ import {
 import { connectToSocket } from "../../Utils/createSocketConnection";
 import { socketContext } from "../../ContextForSocket/context";
 import axios from "axios";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const useCheckAuth = () => {
   const navigate = useNavigate();
@@ -64,5 +64,5 @@ export const useCheckAuth = () => {
     if (!loggedInUser) {
       checkAuth();
     }
-  }, [loggedInUser, SocketContext, dispatch]);
+  }, [loggedInUser, SocketContext, dispatch, navigate]);
 };

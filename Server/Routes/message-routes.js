@@ -4,7 +4,7 @@ import {
   getSelectedUser,
   markMessagesSeen,
   sendMessage,
-} from "../Controller/User-Controller.js";
+} from "../Controller/User-controller.js";
 
 const messageRouter = Router();
 

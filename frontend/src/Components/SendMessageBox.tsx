@@ -2,6 +2,7 @@ import { useState, type ChangeEvent } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
+import { TfiGallery } from "react-icons/tfi";
 
 type Props = {
   setUploading: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,7 +45,7 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
     <div className="flex m-1">
       <input
         type="text"
-        className="w-full rounded outline-none border border-white text-white pl-2"
+        className="w-full h-10 rounded-xl outline-none bg-neutral-100 pl-2"
         placeholder="Your message... "
         name="text"
         value={input}
@@ -52,7 +53,7 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
         onKeyDown={(e) => (e.key === "Enter" ? sendMessageHandler() : null)}
       />
       <label htmlFor="image" className="mx-2 grid place-items-center">
-        <img src="../../src/assets/gallery_icon.svg" className="size-7" />
+        <TfiGallery className="size-6 hover:scale-105" />
       </label>
       <input
         type="file"
