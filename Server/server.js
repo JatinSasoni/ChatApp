@@ -7,6 +7,7 @@ import messageRouter from "./Routes/message-routes.js";
 import { Server } from "socket.io";
 import http from "http";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 //Dot-env
 configDotenv();
@@ -52,6 +53,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(cookieParser());
 app.use(express.json({ limit: "4mb" })); //DEFAULT IS 100KB
 app.use(urlencoded({ extended: true, limit: "4mb" }));
 

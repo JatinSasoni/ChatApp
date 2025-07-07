@@ -1,6 +1,10 @@
 import { UserModel } from "../Model/User-model.js";
 import bcrypt from "bcryptjs";
-import { generateToken } from "../utils/generateLoginToken.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/generateLoginToken.js";
+import jwt from "jsonwebtoken";
 
 //LOGIN CONTROLLER
 export const loginController = async (req, res, next) => {
@@ -26,17 +30,32 @@ export const loginController = async (req, res, next) => {
       userID: user._id,
     };
 
-    const token = generateToken(payload);
+    const AccessToken = generateAccessToken(payload);
+    const RefreshToken = generateRefreshToken(payload);
 
-    return res.status(200).json({
-      success: true,
-      message: `Welcome ${user.username || "user"}`,
-      loggedInUser: { ...user.toObject(), password: "" }, //toObject coz it has some hidden mongoDB fields
-      token,
-    });
+    return res
+      .status(200)
+      .cookie("refreshToken", RefreshToken, {
+        secure: true,
+        httpOnly: true,
+      })
+      .json({
+        success: true,
+        message: `Welcome ${user.username || "user"}`,
+        loggedInUser: { ...user.toObject(), password: "" }, //toObject coz it has some hidden mongoDB fields
+        AccessToken,
+      });
   } catch (error) {
     next(error);
   }
+};
+
+//LOGOUT CONTROLLER
+export const logoutController = async (req, res, next) => {
+  return res.status(200).clearCookie("refreshToken").json({
+    success: true,
+    message: "Logged out",
+  });
 };
 
 //SIGNUP CONTROLLER
@@ -53,7 +72,7 @@ export const signupController = async (req, res, next) => {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = bcrypt.hashSync(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
     await UserModel.create({
       email,
       password: hashedPassword,
@@ -62,6 +81,39 @@ export const signupController = async (req, res, next) => {
     return res.status(201).json({
       success: true,
       message: "Signup successful",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//Refresh-token Controller
+export const refreshTokenController = async (req, res, next) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      const error = new Error("Unauthorized");
+      error.statusCode = 400;
+      throw error;
+    }
+    //validate refresh token
+    jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, decode) => {
+      if (err) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Unauthorized" });
+      }
+      const payload = {
+        userID: decode.userID,
+      };
+
+      const AccessToken = generateAccessToken(payload);
+
+      return res.status(200).json({
+        success: true,
+        AccessToken,
+        message: "Access-token fetched",
+      });
     });
   } catch (error) {
     next(error);
