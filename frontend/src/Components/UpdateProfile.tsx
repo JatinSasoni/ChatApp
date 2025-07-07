@@ -60,11 +60,9 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
     try {
       setLoading(true);
       const response = await api.patch("/api/v1/user/update-user", payload, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        withCredentials: true,
       });
-      if (response.data.success) {
+      if (response?.data?.success) {
         dispatch(setLoggedInUser(response.data.user));
         setIsUpdate((prev) => !prev);
       }
@@ -84,7 +82,7 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
   };
 
   return (
-    <section className="backdrop-blur-sm shadow-sm max-sm:h-[calc(100vh-200px)] max-sm:grid max-sm:place-items-center">
+    <section className="backdrop-blur-sm shadow-sm max-sm:h-[calc(100vh-50px)] max-sm:grid max-sm:place-items-center">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-neutral-50 rounded-lg shadow-lg md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8 bg-neutral-100">

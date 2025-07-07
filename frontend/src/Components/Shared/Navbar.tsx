@@ -26,6 +26,7 @@ const Navbar: React.FC = () => {
   const logoutHandler = async () => {
     try {
       const response = await api.get("api/v1/auth/logout", {
+        // remove refresh token
         withCredentials: true,
       });
       if (response?.data?.success) {

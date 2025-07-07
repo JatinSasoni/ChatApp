@@ -8,7 +8,6 @@ import SendMessageBox from "./SendMessageBox";
 import { IoArrowBackSharp } from "react-icons/io5";
 import MessageBox from "./MessageBox";
 import { setUserSelected } from "../../Store/Slices/message-slice";
-import RightSidebar from "./RightSidebar";
 
 const MessagesContainer: React.FC = () => {
   const dispatch = useDispatch();

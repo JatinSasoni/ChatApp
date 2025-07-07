@@ -39,17 +39,19 @@ export const useCheckAuth = () => {
             SocketContext?.setSocket(newSocket || null);
           }
         } else {
+          dispatch(setLoggedInUser(null));
           navigate("/login");
         }
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
           console.log(error.response?.data);
-          navigate("login");
         } else {
           console.log("An unexpected error occurred:", error);
         }
       }
+      dispatch(setLoggedInUser(null));
+      navigate("/login");
     };
 
     if (!loggedInUser) {

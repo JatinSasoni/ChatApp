@@ -34,7 +34,7 @@ const Login = () => {
       const response = await api.post("/api/v1/auth/login", data, {
         withCredentials: true,
       });
-      if (response.data.success) {
+      if (response?.data?.success) {
         localStorage.setItem("accessToken", response.data?.AccessToken);
         dispatch(setLoggedInUser(response?.data?.loggedInUser));
         const newSocket = connectToSocket(response.data.loggedInUser);

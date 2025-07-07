@@ -3,9 +3,13 @@ import type { RootState } from "../../Store/store";
 import { api } from "../../Api/axios";
 import { setSelectedUserMsgs } from "../../Store/Slices/message-slice";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { setLoggedInUser } from "../../Store/Slices/auth-slice";
 
 export const useFetchAndSend = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const { selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );
@@ -14,12 +18,10 @@ export const useFetchAndSend = () => {
   const fetchUserMessagesHandler = async (selectedUserId: string) => {
     try {
       const response = await api.get(`/api/v1/message/${selectedUserId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+        withCredentials: true,
       });
       if (response.data.success) {
-        dispatch(setSelectedUserMsgs(response?.data.selectedUserMessages));
+        dispatch(setSelectedUserMsgs(response?.data?.selectedUserMessages));
       }
     } catch (error) {
       //*Type guard
@@ -28,6 +30,8 @@ export const useFetchAndSend = () => {
       } else {
         console.log("An unexpected error occurred:", error);
       }
+      dispatch(setLoggedInUser(null));
+      navigate("/login");
     }
   };
 
@@ -43,12 +47,10 @@ export const useFetchAndSend = () => {
         `api/v1/message/send/${selectedUserId}`,
         { text: input, image: image },
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          withCredentials: true,
         }
       );
-      if (response.data.success) {
+      if (response?.data?.success) {
         dispatch(
           setSelectedUserMsgs([
             ...(selectedUserMessages || []), //COZ TYPE OF selectedUserMessages could be of null type
@@ -63,6 +65,8 @@ export const useFetchAndSend = () => {
       } else {
         console.log("An unexpected error occurred:", error);
       }
+      dispatch(setLoggedInUser(null));
+      navigate("/login");
     }
   };
 

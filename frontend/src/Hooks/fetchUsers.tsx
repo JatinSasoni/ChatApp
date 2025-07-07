@@ -6,9 +6,12 @@ import {
 } from "../../Store/Slices/message-slice";
 import axios from "axios";
 import { useDispatch } from "react-redux";
+import { setLoggedInUser } from "../../Store/Slices/auth-slice";
+import { useNavigate } from "react-router-dom";
 
 export const useFetchUsers = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllUsers = async () => {
@@ -16,7 +19,7 @@ export const useFetchUsers = () => {
         const response = await api.get("/api/v1/user/get-users", {
           withCredentials: true,
         });
-        if (response.data.success) {
+        if (response?.data?.success) {
           dispatch(setAllUsers(response?.data?.users || null));
           dispatch(setUnseenMessages(response.data.unseenMessages));
         }
@@ -27,9 +30,11 @@ export const useFetchUsers = () => {
         } else {
           console.log("An unexpected error occurred:", error);
         }
+        dispatch(setLoggedInUser(null));
+        navigate("/login");
       }
     };
 
     fetchAllUsers();
-  }, [dispatch]);
+  }, [dispatch, navigate]);
 };
