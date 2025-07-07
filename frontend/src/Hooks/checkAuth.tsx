@@ -21,20 +21,11 @@ export const useCheckAuth = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-          return;
-        }
-
         const response = await api.get("/api/v1/auth/check", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
           withCredentials: true,
         });
 
-        if (response.data.success) {
+        if (response?.data?.success) {
           //*If Authentication successful Update store
           dispatch(setLoggedInUser(response.data.user));
 
@@ -48,7 +39,7 @@ export const useCheckAuth = () => {
             SocketContext?.setSocket(newSocket || null);
           }
         } else {
-          navigate("login");
+          navigate("/login");
         }
       } catch (error) {
         //*Type guard

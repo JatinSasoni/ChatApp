@@ -31,9 +31,11 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      const response = await api.post("/api/v1/auth/login", data);
+      const response = await api.post("/api/v1/auth/login", data, {
+        withCredentials: true,
+      });
       if (response.data.success) {
-        localStorage.setItem("token", response.data?.token);
+        localStorage.setItem("accessToken", response.data?.AccessToken);
         dispatch(setLoggedInUser(response?.data?.loggedInUser));
         const newSocket = connectToSocket(response.data.loggedInUser);
         dispatch(setSocketId(newSocket?.id || null));
@@ -56,19 +58,17 @@ const Login = () => {
   };
 
   return (
-    <section className="bg-gray-50 ">
+    <section className="bg-gray-50 h-screen max-sm:pt-14 ">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-        <a
-          href="#"
-          className="flex items-center mb-6 text-2xl font-semibold text-gray-900 "
-        >
+        <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
           <img
-            className="w-8 h-8 mr-2"
+            className="size-15 mr-4"
             src="../../public/favicon.svg"
             alt="logo"
           />
-          QuickChat
-        </a>
+
+          <span className="max-sm:text-4xl text-5xl">QuickChat</span>
+        </div>
         <div className="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">

@@ -14,9 +14,6 @@ export const useFetchUsers = () => {
     const fetchAllUsers = async () => {
       try {
         const response = await api.get("/api/v1/user/get-users", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
           withCredentials: true,
         });
         if (response.data.success) {

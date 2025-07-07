@@ -17,7 +17,7 @@ const Profile = () => {
       {/* Main Content */}
       <main className="flex-1 relative p-6 overflow-y-auto shadow-md max-sm:h-[calc(100vh-50px)]  ">
         {/* Edit Button */}
-        <div className="absolute top-6 right-6 ">
+        <div className="absolute max-sm:top-2 top-6 right-6 ">
           <button
             className="bg-white  text-blue-500 px-4 py-2 rounded-md text-sm font-medium shadow hover:bg-gray-100"
             onClick={() => setIsUpdate((prev) => !prev)}

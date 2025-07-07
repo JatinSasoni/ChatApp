@@ -14,6 +14,8 @@ import {
 import { useContext } from "react";
 import { socketContext } from "../../../ContextForSocket/context";
 import type { RootState } from "../../../Store/store";
+import axios from "axios";
+import { api } from "../../../Api/axios";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
@@ -21,16 +23,31 @@ const Navbar: React.FC = () => {
   const SocketContext = useContext(socketContext);
   const { userSelected } = useSelector((state: RootState) => state.message);
 
-  const logoutHandler = () => {
-    localStorage.setItem("token", "");
-    dispatch(setLoggedInUser(null));
-    dispatch(setAllUsers(null));
-    dispatch(setOnlineUsers([]));
-    dispatch(setUserSelected(null));
-    dispatch(setUnseenMessages({}));
-    dispatch(setSelectedUserMsgs(null));
-    SocketContext?.socket?.disconnect();
-    navigate("/login");
+  const logoutHandler = async () => {
+    try {
+      const response = await api.get("api/v1/auth/logout", {
+        withCredentials: true,
+      });
+      if (response?.data?.success) {
+        localStorage.removeItem("accessToken");
+        dispatch(setLoggedInUser(null));
+        dispatch(setAllUsers(null));
+        dispatch(setOnlineUsers([]));
+        dispatch(setUserSelected(null));
+        dispatch(setUnseenMessages({}));
+        dispatch(setSelectedUserMsgs(null));
+        SocketContext?.socket?.disconnect();
+        navigate("/login");
+      }
+    } catch (error) {
+      //*Type guard
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data);
+        navigate("login");
+      } else {
+        console.log("An unexpected error occurred:", error);
+      }
+    }
   };
 
   return (

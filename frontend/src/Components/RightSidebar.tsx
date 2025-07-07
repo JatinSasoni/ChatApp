@@ -7,8 +7,6 @@ const RightSidebar: React.FC = () => {
     (state: RootState) => state.message
   );
   const [msgImages, setMsgImages] = useState<string[] | undefined>([]);
-  console.log(userSelected);
-  console.log(msgImages);
 
   useEffect(() => {
     setMsgImages(() =>
