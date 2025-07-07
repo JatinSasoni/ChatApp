@@ -29,18 +29,17 @@ export const useCheckAuth = () => {
           //*If Authentication successful Update store
           dispatch(setLoggedInUser(response.data.user));
 
-          const newSocket = connectToSocket(response.data.user) || null;
-          if (newSocket) {
-            dispatch(setSocketId(newSocket?.id || null));
+          if (!SocketContext?.socket) {
+            const newSocket = connectToSocket(response.data.user) || null;
+            if (newSocket) {
+              dispatch(setSocketId(newSocket?.id || null));
 
-            newSocket?.on("getOnlineUsers", (userIds: string[]) => {
-              dispatch(setOnlineUsers(userIds));
-            });
-            SocketContext?.setSocket(newSocket || null);
+              newSocket?.on("getOnlineUsers", (userIds: string[]) => {
+                dispatch(setOnlineUsers(userIds));
+              });
+              SocketContext?.setSocket(newSocket || null);
+            }
           }
-        } else {
-          dispatch(setLoggedInUser(null));
-          navigate("/login");
         }
       } catch (error) {
         //*Type guard
@@ -50,8 +49,6 @@ export const useCheckAuth = () => {
           console.log("An unexpected error occurred:", error);
         }
       }
-      dispatch(setLoggedInUser(null));
-      navigate("/login");
     };
 
     if (!loggedInUser) {

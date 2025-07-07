@@ -92,15 +92,15 @@ export const refreshTokenController = async (req, res, next) => {
   try {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-      const error = new Error("Unauthorized");
-      error.statusCode = 400;
+      const error = new Error("Refresh token not provided");
+      error.statusCode = 401;
       throw error;
     }
     //validate refresh token
     jwt.verify(refreshToken, process.env.REFRESH_SECRET_KEY, (err, decode) => {
       if (err) {
         return res
-          .status(400)
+          .status(401)
           .json({ success: false, message: "Unauthorized" });
       }
       const payload = {
@@ -123,5 +123,6 @@ export const refreshTokenController = async (req, res, next) => {
 //CHECK AUTH
 export const checkAuth = async (req, res, next) => {
   const user = req.user; //isAuthenticated
+
   return res.status(200).json({ success: true, user });
 };

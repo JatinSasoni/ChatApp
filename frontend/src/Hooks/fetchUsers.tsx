@@ -6,7 +6,6 @@ import {
 } from "../../Store/Slices/message-slice";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setLoggedInUser } from "../../Store/Slices/auth-slice";
 import { useNavigate } from "react-router-dom";
 
 export const useFetchUsers = () => {
@@ -30,8 +29,6 @@ export const useFetchUsers = () => {
         } else {
           console.log("An unexpected error occurred:", error);
         }
-        dispatch(setLoggedInUser(null));
-        navigate("/login");
       }
     };
 
