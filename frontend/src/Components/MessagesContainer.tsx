@@ -8,9 +8,11 @@ import SendMessageBox from "./SendMessageBox";
 import { IoArrowBackSharp } from "react-icons/io5";
 import MessageBox from "./MessageBox";
 import { setUserSelected } from "../../Store/Slices/message-slice";
+import { useNavigate } from "react-router-dom";
 
 const MessagesContainer: React.FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [uploading, setUploading] = useState<boolean>(false);
   const divTillScroll = useRef<HTMLDivElement>(null);
   const { userSelected, selectedUserMessages } = useSelector(
@@ -52,8 +54,11 @@ const MessagesContainer: React.FC = () => {
           <div className="max-sm:h-full flex flex-col">
             {/* header */}
             <header className="sticky top-0 shadow-md z-10">
-              <div className="py-3 pl-3 flex justify-between">
-                <div className="flex items-center gap-2 ">
+              <div className="py-3 pl-3 flex justify-between ">
+                <div
+                  onClick={() => navigate(`/chat/mobile/profile`)}
+                  className="flex items-center gap-2 pr-32"
+                >
                   <img
                     src={
                       userSelected.Profile.profilePhoto || "/avatar_icon.png"

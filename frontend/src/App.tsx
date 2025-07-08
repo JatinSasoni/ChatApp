@@ -9,6 +9,7 @@ import { VerifyOTPPage } from "./Pages/VerifyOTPPage";
 import { ChangePasswordPage } from "./Pages/ChangePasswordPage";
 import PreventLogin from "./ProtectRoutes/PreventLoginIfLoggedIn";
 import ProtectChangePass from "./ProtectRoutes/ProtectChangePass";
+import ProfileMobileOnly from "./Components/ProfileMobileOnly";
 
 const Router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const Router = createBrowserRouter([
   {
     path: "/profile",
     element: <Profile />,
+  },
+  {
+    path: "/chat/mobile/profile",
+    element: <ProfileMobileOnly />,
   },
   {
     path: "/forgot-password/get-otp",
