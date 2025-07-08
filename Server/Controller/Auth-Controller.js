@@ -187,7 +187,7 @@ export const getOTP = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: `OTP sent to ${user.email}`,
+      message: `OTP sent to you mail`,
       userID: user._id,
     });
   } catch (error) {
@@ -214,7 +214,6 @@ export const verifyOTP = async (req, res, next) => {
     }
 
     if (otp !== user.otp || user.otpExpiresAt < Date.now()) {
-      (user.otp = ""), (user.otpExpiresAt = ""), await user.save();
       const error = new Error("Expired or invalid OTP");
       error.statusCode = 400;
       throw error;
@@ -263,6 +262,7 @@ export const changePasswordController = async (req, res, next) => {
       await user.save();
     } catch (error) {
       error.statusCode = 400;
+      error.message = "Unauthorized";
       throw error;
     }
 

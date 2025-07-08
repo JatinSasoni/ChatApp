@@ -2,10 +2,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./Components/Home";
 import Signup from "./Pages/Signup";
 import Login from "./Pages/Login";
-import ProtectRoute from "./ProtectRoutes/ProtectRoute";
+import ProtectRoute from "./ProtectRoutes/PreventLoginIfLoggedIn";
 import Profile from "./Components/Profile";
-import { ResetPassPage } from "./Pages/ResetPasspage";
+import { GetOTPPage } from "./Pages/GetOTPPage";
 import { VerifyOTPPage } from "./Pages/VerifyOTPPage";
+import { ChangePasswordPage } from "./Pages/ChangePasswordPage";
+import PreventLogin from "./ProtectRoutes/PreventLoginIfLoggedIn";
+import ProtectChangePass from "./ProtectRoutes/ProtectChangePass";
 
 const Router = createBrowserRouter([
   {
@@ -15,9 +18,9 @@ const Router = createBrowserRouter([
   {
     path: "/login",
     element: (
-      <ProtectRoute>
+      <PreventLogin>
         <Login />
-      </ProtectRoute>
+      </PreventLogin>
     ),
   },
   {
@@ -34,11 +37,19 @@ const Router = createBrowserRouter([
   },
   {
     path: "/forgot-password/get-otp",
-    element: <ResetPassPage />,
+    element: <GetOTPPage />,
   },
   {
     path: "/user/verify/:userID/otp",
     element: <VerifyOTPPage />,
+  },
+  {
+    path: "/user/change/password",
+    element: (
+      <ProtectChangePass>
+        <ChangePasswordPage />,
+      </ProtectChangePass>
+    ),
   },
 ]);
 

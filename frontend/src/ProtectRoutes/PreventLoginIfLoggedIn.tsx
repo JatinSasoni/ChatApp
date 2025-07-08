@@ -7,7 +7,7 @@ type props = {
   children: React.ReactNode;
 };
 
-const ProtectRoute: React.FC<props> = ({ children }) => {
+const PreventLogin: React.FC<props> = ({ children }) => {
   const { loggedInUser } = useSelector((state: RootState) => state.auth);
 
   if (loggedInUser) {
@@ -17,4 +17,4 @@ const ProtectRoute: React.FC<props> = ({ children }) => {
   return children;
 };
 
-export default ProtectRoute;
+export default PreventLogin;

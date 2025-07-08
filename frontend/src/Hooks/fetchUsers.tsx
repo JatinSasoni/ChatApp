@@ -7,6 +7,7 @@ import {
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export const useFetchUsers = () => {
   const dispatch = useDispatch();
@@ -25,7 +26,7 @@ export const useFetchUsers = () => {
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
+          toast.error(error.response?.data.message);
         } else {
           console.log("An unexpected error occurred:", error);
         }

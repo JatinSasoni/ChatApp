@@ -6,7 +6,7 @@ type Props = {
   setOtp: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-export const OtpLogic: React.FC<Props> = ({ length = 4, otp, setOtp }) => {
+export const OtpBox: React.FC<Props> = ({ length = 4, otp, setOtp }) => {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleOnChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +61,7 @@ export const OtpLogic: React.FC<Props> = ({ length = 4, otp, setOtp }) => {
           key={index}
           autoComplete="one-time-code"
           value={value}
-          className="border w-10 h-10 md:w-16 md:h-16 text-center dark:bg-zinc-700 dark:border-none dark:text-white"
+          className="border w-10 h-10 md:w-16 md:h-16 text-center"
           ref={(input) => {
             inputRefs.current[index] = input;
           }}

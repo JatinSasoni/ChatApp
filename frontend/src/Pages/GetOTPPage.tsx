@@ -5,7 +5,7 @@ import { globalApi } from "../../Api/axios";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-export const ResetPassPage = () => {
+export const GetOTPPage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -50,17 +50,17 @@ export const ResetPassPage = () => {
 
   return (
     <>
-      <div className="py-28">
-        <div className=" mx-auto max-w-lg relative flex flex-col p-4 rounded-3xl text-black md:bg-white shadow-black drop-shadow-sm md:drop-shadow-md dark:bg-zinc-900">
-          <div className="text-3xl font-bold mb-2 text-[#1e0e4b] text-center dark:text-slate-200">
+      <div className="sm:h-screen sm:grid sm:place-items-center max-sm:py-44">
+        <div className=" mx-auto max-w-lg relative flex flex-col p-4 rounded-xl text-black md:bg-white shadow-black drop-shadow-sm md:drop-shadow-md">
+          <div className="text-3xl sm:px-20 font-bold mb-2 text-[#1e0e4b] text-center ">
             Forgot Your Password?
-            <span className="text-blue-400 block font-semibold">
-              We Are Here
+            <span className="text-purple-600 block font-semibold">
+              We got you :)
             </span>
           </div>
 
           <form
-            className="flex flex-col gap-3 dark:[&>div>label]:text-white"
+            className="flex flex-col gap-3 "
             onSubmit={handleSubmit(onSubmit)}
           >
             {/* EMAIL */}
@@ -84,7 +84,7 @@ export const ResetPassPage = () => {
                     message: "Invalid email format",
                   },
                 })}
-                className="rounded border border-gray-200 text-sm w-full font-normal leading-[18px] text-black tracking-[0px] appearance-none block h-11 m-0 p-[11px] focus:ring-1 ring-offset-2  ring-gray-900 outline-0 dark:bg-zinc-700 dark:border-none dark:text-gray-50"
+                className="rounded border border-gray-200 text-sm w-full font-normal leading-[18px] text-black tracking-[0px] appearance-none block h-11 m-0 p-[11px] focus:ring-1 ring-offset-2  ring-gray-900 outline-0 "
               />
               {errors.email && (
                 <span className="text-blue-900 dark:text-red-500 text-sm">
@@ -96,7 +96,7 @@ export const ResetPassPage = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="bg-blue-400 w-max m-auto px-6 py-2 rounded text-white text-sm font-normal"
+              className="bg-purple-600 w-max m-auto px-6 py-2 rounded text-white text-sm font-normal"
             >
               {/* IF LOADING IS TRUE THEN SHOW LOADER ELSE SUBMIT BUTTON */}
               {loading ? <div className="loader"></div> : "Send OTP"}

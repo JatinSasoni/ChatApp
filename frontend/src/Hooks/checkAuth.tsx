@@ -48,6 +48,7 @@ export const useCheckAuth = () => {
         } else {
           console.log("An unexpected error occurred:", error);
         }
+        window.location.href = "/login";
       }
     };
 
