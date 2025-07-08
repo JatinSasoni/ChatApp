@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
 
   return (
     <header
-      className={` ${
+      className={` flex ${
         userSelected && "max-sm:hidden"
       } sm:min-w-20 max-sm:w-screen sm:h-screen max-sm:pb-2`}
     >

@@ -138,12 +138,12 @@ const Login = () => {
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <a
-                  href="#"
+                <NavLink
+                  to="/forgot-password/get-otp"
                   className="text-sm font-medium text-primary-600 hover:underline"
                 >
                   Forgot password?
-                </a>
+                </NavLink>
               </div>
               <button
                 type="submit"

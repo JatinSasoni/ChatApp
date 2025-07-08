@@ -3,6 +3,10 @@ import axios from "axios";
 export const api = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
 });
+export const globalApi = axios.create({
+  //INSTANCE FOR LOGIN,SIGNUP ETC
+  baseURL: import.meta.env.VITE_BACKEND_URL,
+});
 
 api.interceptors.request.use(
   (config) => {

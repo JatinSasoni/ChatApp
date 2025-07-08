@@ -15,6 +15,12 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    otp: {
+      type: String,
+    },
+    otpExpiresAt: {
+      type: String,
+    },
     Profile: {
       bio: { type: String },
       profilePhoto: {

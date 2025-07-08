@@ -12,7 +12,7 @@ import { setUserSelected } from "../../Store/Slices/message-slice";
 const MessagesContainer: React.FC = () => {
   const dispatch = useDispatch();
   const [uploading, setUploading] = useState<boolean>(false);
-  const divTillScroll = useRef<HTMLInputElement>(null);
+  const divTillScroll = useRef<HTMLDivElement>(null);
   const { userSelected, selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );

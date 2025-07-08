@@ -1,4 +1,5 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
+import mongoose from "mongoose";
 
 export const signupValidation = [
   body("username")
@@ -42,4 +43,37 @@ export const loginValidation = [
       minUppercase: 1,
     })
     .withMessage("Password is not strong enough"),
+];
+
+export const otpRouteValidation = [
+  body("email")
+    .isEmail()
+    .withMessage("Invalid email format")
+    .trim()
+    .toLowerCase()
+    .normalizeEmail()
+    .escape(),
+];
+
+const validateMongooseID = (userID) => {
+  const isValid = mongoose.isValidObjectId(userID);
+  if (!isValid) throw new Error("Invalid ID");
+  return true;
+};
+export const verifyOtpRouteValidation = [
+  param("userID").custom((value) => validateMongooseID(value)),
+  body("otp").notEmpty().withMessage("OTP Is required"),
+];
+
+export const newPasswordValidation = [
+  body("password")
+    .isStrongPassword({
+      minLength: 8,
+      minLowercase: 1,
+      minUppercase: 1,
+      minSymbols: 1,
+      minNumbers: 1,
+    })
+    .withMessage("Password is not strong enough")
+    .escape(),
 ];

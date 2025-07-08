@@ -8,6 +8,7 @@ import { Server } from "socket.io";
 import http from "http";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { transporter } from "./utils/nodemailer.js";
 
 //Dot-env
 configDotenv();
@@ -81,6 +82,10 @@ const PORT = process.env.PORT || 7000;
 
 //Listen
 await connectToDB(process.env.MONGODB_URI);
-server.listen(PORT, () => {
+// transporter
+//   .verify()
+//   .then(() => console.log("Server is ready to send mails"))
+//   .catch((err) => console.log(err.message));
+server.listen(PORT, async () => {
   console.log(`Server started at PORT ${PORT}`);
 });
