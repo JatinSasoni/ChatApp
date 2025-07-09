@@ -57,9 +57,9 @@ const Navbar: React.FC = () => {
 
   return (
     <header
-      className={` flex ${
-        userSelected && "max-sm:hidden"
-      } sm:min-w-20 max-sm:w-screen sm:h-screen max-sm:pb-2`}
+      className={`flex ${
+        userSelected && "max-lg:hidden"
+      } px-2 max-sm:w-screen sm:h-screen max-sm:pb-2`}
     >
       <div className="flex sm:flex-col gap-4 px-2 pt-2 sm:h-full max-sm:w-screen max-sm:justify-between">
         <div className="flex gap-2 justify-center ">
@@ -85,14 +85,18 @@ const Navbar: React.FC = () => {
             </li>
             <li className="sm:hidden">
               <CiLogout
-                className="size-6 hover:scale-105 duration-300 "
+                className={`size-6  hover:scale-105 duration-300 ${
+                  loading && "animate-pulse "
+                }`}
                 onClick={logoutHandler}
               />
             </li>
           </ul>
           <div className="flex flex-col mb-4 items-center max-sm:hidden">
             <CiLogout
-              className="size-6  hover:scale-105 duration-300 "
+              className={`size-6  hover:scale-105 duration-300 ${
+                loading && "animate-pulse "
+              }`}
               onClick={logoutHandler}
             />
           </div>

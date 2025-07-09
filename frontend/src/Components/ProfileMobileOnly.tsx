@@ -7,7 +7,7 @@ import RightSidebarContent from "./RightSidebarContent";
 
 const MobileProfile = () => {
   const navigate = useNavigate();
-  const isLargeScreen = useMediaQuery({ minWidth: 640 });
+  const isLargeScreen = useMediaQuery({ minWidth: 1160 });
   const { userSelected, selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );
@@ -32,7 +32,7 @@ const MobileProfile = () => {
   }, [isLargeScreen, navigate]);
 
   return (
-    <div className="p-2 sm:hidden">
+    <div className="p-2 min-[1160px]:hidden">
       <button
         onClick={() => navigate(-1)}
         className="text-md text-blue-500 mb-3"

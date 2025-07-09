@@ -28,9 +28,9 @@ const Sidebar: React.FC = () => {
 
   return (
     <div
-      className={`${
-        userSelected && "max-sm:hidden"
-      } p-2 min-w-70 overflow-y-scroll max-sm:h-[calc(100vh-56px)] sm:h-screen drop-shadow-md shadow-md duration-300`}
+      className={`mr-2 ${
+        userSelected && "max-[880px]:hidden"
+      } p-2 min-w-52 min-[1400px]:min-w-70 overflow-y-scroll max-sm:h-[calc(100vh-56px)] sm:h-screen drop-shadow-md shadow-md duration-300`}
     >
       {/* Header */}
 
@@ -64,12 +64,14 @@ const Sidebar: React.FC = () => {
                   );
                 }}
               >
-                <div className="flex p-1 gap-3">
-                  <img
-                    src={user?.Profile.profilePhoto || "/avatar_icon.png"}
-                    alt=""
-                    className="size-11 rounded-full"
-                  />
+                <div className="flex p-1 gap-2">
+                  <div className="min-w-10">
+                    <img
+                      src={user?.Profile.profilePhoto || "/avatar_icon.png"}
+                      alt=""
+                      className="size-10 rounded-full object-cover"
+                    />
+                  </div>
                   <div className=" flex justify-between pr-3 w-full items-center">
                     <div>
                       <p className="group group-hover:scale-105 duration-300">

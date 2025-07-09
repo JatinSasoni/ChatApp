@@ -42,10 +42,10 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
   };
 
   return (
-    <div className="flex m-1">
+    <div className="flex m-1 p-1 shadow-2xl ">
       <input
         type="text"
-        className="w-full h-10 rounded-xl outline-none bg-neutral-100 pl-2"
+        className="w-full h-10 rounded-xl outline-none bg-neutral-100 pl-2 border"
         placeholder="Your message... "
         name="text"
         value={input}
@@ -64,11 +64,7 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
       />
 
       <button onClick={sendMessageHandler} disabled={uploading}>
-        <img
-          src="../../src/assets/send_button.svg"
-          alt="send"
-          className="size-8"
-        />
+        <img src="/send_button.svg" alt="send" className="size-8" />
       </button>
     </div>
   );

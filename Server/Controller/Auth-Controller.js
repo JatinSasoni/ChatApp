@@ -41,6 +41,7 @@ export const loginController = async (req, res, next) => {
       .cookie("refreshToken", RefreshToken, {
         secure: true,
         httpOnly: true,
+        sameSite: "None",
       })
       .json({
         success: true,
@@ -228,6 +229,7 @@ export const verifyOTP = async (req, res, next) => {
       .cookie("auth", token, {
         httpOnly: true,
         secure: true,
+        sameSite: "None",
       })
       .json({
         success: true,

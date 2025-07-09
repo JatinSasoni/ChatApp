@@ -12,7 +12,7 @@ const MessageBox: React.FC<Props> = ({ message }) => {
   const { loggedInUser } = useSelector((state: RootState) => state.auth);
   return (
     <div
-      className={`m-2 flex ${
+      className={`my-1 flex ${
         message.senderId === loggedInUser?._id ? "flex-row-reverse" : ""
       }`}
     >
