@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
 //Middlewares
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://quickchatpro.netlify.app"],
     credentials: true,
   })
 );

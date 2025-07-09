@@ -53,7 +53,7 @@ export const ChangePasswordPage = () => {
     <div className="sm:h-screen sm:grid sm:place-items-center max-sm:py-44">
       <div className=" mx-auto max-w-lg relative flex flex-col p-4 rounded-3xl text-black shadow-purple-200 shadow-xl">
         <div className="text-3xl font-bold mb-2 text-[#1e0e4b] text-center sm:px-20">
-          <span className="text-purple-600 font-bold text-4xl block">
+          <span className="text-blue-600 font-bold text-4xl block">
             New Password
           </span>
         </div>
@@ -131,7 +131,7 @@ export const ChangePasswordPage = () => {
           {/* SUBMIT BUTTON */}
           <button
             type="submit"
-            className="bg-purple-600 w-full m-auto px-6 py-2 rounded-xl text-white text-sm font-normal"
+            className="bg-blue-600 w-full m-auto px-6 py-2 rounded-xl text-white text-sm font-normal"
           >
             {/* IF LOADING IS TRUE THEN SHOW LOADER ELSE SUBMIT BUTTON */}
             {loading ? (

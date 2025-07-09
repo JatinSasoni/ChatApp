@@ -79,6 +79,11 @@ const MessagesContainer: React.FC = () => {
             </header>
             {/* Scrollable messages container */}
             <div className="overflow-y-scroll max-sm:h-[calc(100vh-60px)] sm:h-[580px] bg-neutral-100 rounded-md">
+              {!selectedUserMessages && (
+                <div className="h-full grid place-items-center backdrop-blur-3xl text-xl">
+                  <div className="loader2"></div>
+                </div>
+              )}
               {selectedUserMessages?.map((message: Message, i: number) => {
                 return <MessageBox message={message} key={i} />;
               })}

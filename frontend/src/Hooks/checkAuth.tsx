@@ -28,7 +28,6 @@ export const useCheckAuth = () => {
         if (response?.data?.success) {
           //*If Authentication successful Update store
           dispatch(setLoggedInUser(response.data.user));
-
           if (!SocketContext?.socket) {
             const newSocket = connectToSocket(response.data.user) || null;
             if (newSocket) {

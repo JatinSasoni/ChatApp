@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { CiChat1, CiUser, CiHome, CiLogout } from "react-icons/ci";
+import { CiUser, CiHome, CiLogout } from "react-icons/ci";
 import {
   setLoggedInUser,
   setOnlineUsers,
@@ -11,7 +11,7 @@ import {
   setUnseenMessages,
   setUserSelected,
 } from "../../../Store/Slices/message-slice";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { socketContext } from "../../../ContextForSocket/context";
 import type { RootState } from "../../../Store/store";
 import axios from "axios";
@@ -20,11 +20,13 @@ import { api } from "../../../Api/axios";
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState<boolean>(false);
   const SocketContext = useContext(socketContext);
   const { userSelected } = useSelector((state: RootState) => state.message);
 
   const logoutHandler = async () => {
     try {
+      setLoading(true);
       const response = await api.get("api/v1/auth/logout", {
         // remove refresh token
         withCredentials: true,
@@ -48,6 +50,8 @@ const Navbar: React.FC = () => {
       } else {
         console.log("An unexpected error occurred:", error);
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,12 +63,7 @@ const Navbar: React.FC = () => {
     >
       <div className="flex sm:flex-col gap-4 px-2 pt-2 sm:h-full max-sm:w-screen max-sm:justify-between">
         <div className="flex gap-2 justify-center ">
-          <img
-            src="../../../public/favicon.svg"
-            alt="Logo"
-            width="40"
-            height="20"
-          />
+          <img src="/favicon.svg" alt="Logo" width="40" height="20" />
           <p className="sm:hidden my-auto">QuickChat</p>
         </div>
         <nav className="flex sm:flex-col justify-between h-full">

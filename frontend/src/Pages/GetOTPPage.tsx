@@ -54,7 +54,7 @@ export const GetOTPPage = () => {
         <div className=" mx-auto max-w-lg relative flex flex-col p-4 rounded-xl text-black md:bg-white shadow-black drop-shadow-sm md:drop-shadow-md">
           <div className="text-3xl sm:px-20 font-bold mb-2 text-[#1e0e4b] text-center ">
             Forgot Your Password?
-            <span className="text-purple-600 block font-semibold">
+            <span className="text-blue-600 block font-semibold">
               We got you :)
             </span>
           </div>
@@ -96,7 +96,7 @@ export const GetOTPPage = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="bg-purple-600 w-max m-auto px-6 py-2 rounded text-white text-sm font-normal"
+              className="bg-blue-600 w-max m-auto px-6 py-2 rounded text-white text-sm font-normal"
             >
               {/* IF LOADING IS TRUE THEN SHOW LOADER ELSE SUBMIT BUTTON */}
               {loading ? <div className="loader "></div> : "Send OTP"}

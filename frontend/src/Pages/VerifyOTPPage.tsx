@@ -54,9 +54,7 @@ export const VerifyOTPPage = () => {
       <div className="sm:h-screen sm:grid sm:place-items-center max-sm:py-44">
         <div className="mx-3 md:mx-auto max-w-lg relative flex flex-col p-4 rounded-3xl text-black md:bg-white shadow-black md:drop-shadow-xl ">
           <div className="text-4xl font-bold mb-2 text-center">
-            <span className="text-purple-600 font-bold ">
-              Enter 6 Digit OTP
-            </span>
+            <span className="text-blue-600 font-bold ">Enter 6 Digit OTP</span>
           </div>
 
           {/* OTP */}
@@ -66,7 +64,7 @@ export const VerifyOTPPage = () => {
             {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="bg-purple-600 w-full m-auto px-6 py-2 rounded-xl text-white text-sm font-normal "
+              className="bg-blue-600 w-full m-auto px-6 py-2 rounded-xl text-white text-sm font-normal "
             >
               {/* IF LOADING IS TRUE THEN SHOW LOADER ELSE SUBMIT BUTTON */}
               {loading ? (

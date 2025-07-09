@@ -9,7 +9,7 @@ import {
   setSocketId,
 } from "../../Store/Slices/auth-slice";
 import { connectToSocket } from "../../Utils/createSocketConnection";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { socketContext } from "../../ContextForSocket/context";
 import toast from "react-hot-toast";
 
@@ -22,6 +22,7 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const SocketContext = useContext(socketContext);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const {
     register,
@@ -31,6 +32,7 @@ const Login = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
+      setLoading(true);
       const response = await api.post("/api/v1/auth/login", data, {
         withCredentials: true,
       });
@@ -54,6 +56,8 @@ const Login = () => {
         console.log("An unexpected error occurred:", error);
         toast.error("An unexpected error occurred");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -61,11 +65,7 @@ const Login = () => {
     <section className="bg-gray-50 h-screen max-sm:pt-14 ">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
-          <img
-            className="size-15 mr-4"
-            src="../../public/favicon.svg"
-            alt="logo"
-          />
+          <img className="size-15 mr-4" src="/favicon.svg" alt="logo" />
 
           <span className="max-sm:text-4xl text-5xl">QuickChat</span>
         </div>
@@ -145,11 +145,18 @@ const Login = () => {
                   Forgot password?
                 </NavLink>
               </div>
+
               <button
                 type="submit"
                 className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center  bg-blue-600"
               >
-                login
+                {loading ? (
+                  <div className="grid place-items-center">
+                    <div className="loader"></div>{" "}
+                  </div>
+                ) : (
+                  "Login"
+                )}
               </button>
               <p className="text-sm font-light text-gray-500 ">
                 Don’t have an account yet?{" "}

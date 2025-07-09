@@ -48,6 +48,9 @@ const Sidebar: React.FC = () => {
       </div>
       {/*Friends */}
       <aside>
+        {!filteredUsers && (
+          <div className="animate-pulse text-center">Finding Users...</div>
+        )}
         <ul className="flex flex-col gap-3 ">
           {filteredUsers?.map((user, key: number) => {
             return (
