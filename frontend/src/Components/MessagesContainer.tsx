@@ -50,7 +50,7 @@ const MessagesContainer: React.FC = () => {
   }`}
     >
       {userSelected ? (
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full ">
           {/* Header */}
           <header className="sticky top-0 z-10 bg-white border-b px-4 py-3 flex items-center justify-between">
             <div
@@ -76,7 +76,7 @@ const MessagesContainer: React.FC = () => {
           </header>
 
           {/* Message List */}
-          <div className="flex-1 overflow-y-auto px-2 py-2 bg-gray-50">
+          <div className="flex-1 overflow-y-auto px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover">
             {!selectedUserMessages && (
               <div className="h-full grid place-items-center text-lg text-gray-500">
                 <span className="loader2" />
@@ -98,7 +98,7 @@ const MessagesContainer: React.FC = () => {
           </div>
 
           {/* Send Message Box */}
-          <div className="border-t  bg-white px-2">
+          <div className="border-t  bg-white px-2 ">
             <SendMessageBox uploading={uploading} setUploading={setUploading} />
           </div>
         </div>
@@ -108,7 +108,7 @@ const MessagesContainer: React.FC = () => {
           <img
             src="/logo_big.svg"
             alt="Chat Logo"
-            className="w-70 mb-4 drop-shadow-md"
+            className="w-80 mb-4 drop-shadow-md"
           />
           <p className="text-gray-500 text-sm">
             Select a conversation to get started

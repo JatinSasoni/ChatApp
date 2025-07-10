@@ -17,6 +17,20 @@ configDotenv();
 const app = express();
 const server = http.createServer(app);
 
+//Middlewares
+const allowedOrigins = [
+  "http://localhost:5173/",
+  "https://quickchatpro.netlify.app/",
+];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
+
 //SOCKET.io
 export const io = new Server(server, {
   cors: {
@@ -47,13 +61,6 @@ io.on("connection", (socket) => {
   });
 });
 
-//Middlewares
-app.use(
-  cors({
-    origin: ["http://localhost:5173", "https://quickchatpro.netlify.app"],
-    credentials: true,
-  })
-);
 app.use(cookieParser());
 app.use(express.json({ limit: "4mb" })); //DEFAULT IS 100KB
 app.use(urlencoded({ extended: true, limit: "4mb" }));
@@ -77,7 +84,6 @@ app.use((err, req, res, next) => {
 });
 
 //PORT
-
 const PORT = process.env.PORT || 7000;
 
 //Listen

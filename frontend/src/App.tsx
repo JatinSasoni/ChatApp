@@ -10,6 +10,7 @@ import { ChangePasswordPage } from "./Pages/ChangePasswordPage";
 import PreventLogin from "./ProtectRoutes/PreventLoginIfLoggedIn";
 import ProtectChangePass from "./ProtectRoutes/ProtectChangePass";
 import ProfileMobileOnly from "./Components/ProfileMobileOnly";
+import ErrorPage from "./Pages/ErrorPage";
 
 const Router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ const Router = createBrowserRouter([
         <ChangePasswordPage />,
       </ProtectChangePass>
     ),
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
   },
 ]);
 
