@@ -28,7 +28,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <div
-      className={`mr-2 ${
+      className={`mx-2 ${
         userSelected && "max-[880px]:hidden"
       } p-2 min-w-52 min-[1400px]:min-w-70 overflow-y-scroll max-sm:h-[calc(100vh-56px)] sm:h-screen drop-shadow-md shadow-md duration-300`}
     >

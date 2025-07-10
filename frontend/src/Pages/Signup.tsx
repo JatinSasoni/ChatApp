@@ -1,5 +1,5 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { api } from "../../Api/axios";
+import { globalApi } from "../../Api/axios";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -23,7 +23,7 @@ const Signup = () => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       setLoading(true);
-      const response = await api.post("api/v1/auth/signup", data);
+      const response = await globalApi.post("api/v1/auth/signup", data);
       if (response.data.success) {
         toast.success(response.data.message);
         navigate("/login");
@@ -44,20 +44,16 @@ const Signup = () => {
   };
 
   return (
-    <section className="bg-gray-50 h-screen max-sm:py-12">
+    <section className="bg-gray-50 h-screen max-sm:py-12 bg-[url('loginbg.jpg')] max-sm:bg-contain sm:bg-cover bg-repeat-round">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
-          <img
-            className="size-15 mr-4"
-            src="../../public/favicon.svg"
-            alt="logo"
-          />
+          <img className="size-15 mr-4" src="/favicon.svg" alt="logo" />
 
           <span className="max-sm:text-4xl text-5xl">QuickChat</span>
         </div>
         <div className="w-full bg-white rounded-lg shadow  md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl ">
+            <h1 className="text-xl font-medium leading-tight tracking-tight text-gray-900 md:text-2xl ">
               Sign in to your account
             </h1>
             <form

@@ -42,7 +42,7 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
   };
 
   return (
-    <div className="flex m-1 p-1 shadow-2xl ">
+    <div className="flex m-1 p-1">
       <input
         type="text"
         className="w-full h-10 rounded-xl outline-none bg-neutral-100 pl-2 border"

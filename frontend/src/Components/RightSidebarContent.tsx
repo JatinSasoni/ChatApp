@@ -25,13 +25,17 @@ const RightSidebarContent: React.FC<Props> = ({ userSelected, msgImages }) => {
         <p className="text-2xl mt-2 text-center">
           {userSelected?.username || "User"}
         </p>
+        <p className="text-sm text-center overflow-x-scroll">
+          {userSelected?.Profile.bio}
+        </p>
+
         <p className="text-sm text-center">
           {userSelected?.email || "unknown"}
         </p>
       </div>
       {/* Media */}
       <p className="font-medium">Media</p>
-      <div className="p-2 rounded-md h-90 overflow-scroll shadow ">
+      <div className="p-2 rounded-md h-90 overflow-scroll shadow bg-slate-50 border border-slate-400">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 gap-2 gap-y-4 p-2 ">
           {msgImages && msgImages.length > 0 ? (
             msgImages.map((image, index) => (

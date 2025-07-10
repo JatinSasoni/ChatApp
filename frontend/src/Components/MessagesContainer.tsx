@@ -19,7 +19,7 @@ const MessagesContainer: React.FC = () => {
     (state: RootState) => state.message
   );
   const { onlineUsers } = useSelector((state: RootState) => state.auth);
-  const { fetchUserMessagesHandler } = useFetchAndSend(); //CUSTOM HOOK
+  const { fetchUserMessagesHandler, messageLoading } = useFetchAndSend(); //CUSTOM HOOK
 
   //* useEffect to fetch selected user's messages
   useEffect(() => {
@@ -42,7 +42,7 @@ const MessagesContainer: React.FC = () => {
 
   return (
     <section
-      className={`h-full w-full flex flex-col bg-white rounded-lg shadow-md shadow-purple-300 transition-all
+      className={`h-full w-full flex flex-col bg-white rounded-lg shadow-md transition-all
   ${
     userSelected
       ? "min-[1430px]:min-w-[868px] max-[1430px]:min-w-[760px] max-[1270px]:min-w-[660px] max-[900px]:min-w-full"
@@ -77,7 +77,7 @@ const MessagesContainer: React.FC = () => {
 
           {/* Message List */}
           <div className="flex-1 overflow-y-auto px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover">
-            {!selectedUserMessages && (
+            {messageLoading && (
               <div className="h-full grid place-items-center text-lg text-gray-500">
                 <span className="loader2" />
               </div>
@@ -104,7 +104,7 @@ const MessagesContainer: React.FC = () => {
         </div>
       ) : (
         // Empty state when no user selected
-        <div className="hidden sm:flex flex-col items-center justify-center w-full h-full bg-gray-50 p-6">
+        <div className="hidden sm:flex flex-col items-center justify-center w-full h-full bg-gray-100 p-6">
           <img
             src="/logo_big.svg"
             alt="Chat Logo"

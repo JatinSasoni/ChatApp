@@ -50,58 +50,64 @@ export const GetOTPPage = () => {
 
   return (
     <>
-      <div className="sm:h-screen sm:grid sm:place-items-center max-sm:py-44">
-        <div className=" mx-auto max-w-lg relative flex flex-col p-4 rounded-xl text-black md:bg-white shadow-black drop-shadow-sm md:drop-shadow-md">
-          <div className="text-3xl sm:px-20 font-bold mb-2 text-[#1e0e4b] text-center ">
-            Forgot Your Password?
-            <span className="text-blue-600 block font-semibold">
-              We got you :)
-            </span>
+      <div className="h-screen sm:grid sm:place-items-center max-sm:py-44 bg-[url('/loginbg.jpg')] bg-cover max-sm:bg-center">
+        <div className="mx-auto sm:min-w-xl md:min-w-3xl lg:min-w-4xl flex p-4 rounded-xl text-black sm:bg-zinc-50 shadow-black drop-shadow-sm md:drop-shadow-md">
+          <div className="w-1/2 max-sm:hidden">
+            <img src="/forgotpassword.svg" alt="" />
           </div>
-
-          <form
-            className="flex flex-col gap-3 "
-            onSubmit={handleSubmit(onSubmit)}
-          >
-            {/* EMAIL */}
-            <div className="block relative">
-              <label
-                htmlFor="email"
-                className="block text-gray-600 cursor-text text-sm leading-[140%] font-normal mb-2"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                {...register("email", {
-                  required: {
-                    value: true,
-                    message: "Email is required",
-                  },
-                  pattern: {
-                    value: /^\S+@\S+\.\S+$/,
-                    message: "Invalid email format",
-                  },
-                })}
-                className="rounded border border-gray-200 text-sm w-full font-normal leading-[18px] text-black tracking-[0px] appearance-none block h-11 m-0 p-[11px] focus:ring-1 ring-offset-2  ring-gray-900 outline-0 "
-              />
-              {errors.email && (
-                <span className="text-blue-900 dark:text-red-500 text-sm">
-                  *{errors.email.message}
-                </span>
-              )}
+          <div className="my-auto max-sm:mx-auto">
+            <div className="text-2xl md:text-3xl lg:px-10 font-bold mb-2 text-[#1e0e4b] text-center ">
+              Forgot Your Password?
+              <span className="text-blue-600 block font-semibold">
+                We got you :)
+              </span>
             </div>
 
-            {/* SUBMIT BUTTON */}
-            <button
-              type="submit"
-              className="bg-blue-600 w-max m-auto px-6 py-2 rounded text-white text-sm font-normal"
+            {/* email */}
+            <form
+              className="flex flex-col gap-3 "
+              onSubmit={handleSubmit(onSubmit)}
             >
-              {/* IF LOADING IS TRUE THEN SHOW LOADER ELSE SUBMIT BUTTON */}
-              {loading ? <div className="loader "></div> : "Send OTP"}
-            </button>
-          </form>
+              {/* EMAIL */}
+              <div className="block relative">
+                <label
+                  htmlFor="email"
+                  className="block text-gray-600 cursor-text text-sm leading-[140%] font-normal mb-2"
+                >
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  {...register("email", {
+                    required: {
+                      value: true,
+                      message: "Email is required",
+                    },
+                    pattern: {
+                      value: /^\S+@\S+\.\S+$/,
+                      message: "Invalid email format",
+                    },
+                  })}
+                  className="max-sm:bg-white rounded border border-gray-200 text-sm w-full font-normal leading-[18px] text-black tracking-[0px] appearance-none block h-11 m-0 p-[11px] focus:ring-1 ring-offset-2  ring-gray-900 outline-0 "
+                />
+                {errors.email && (
+                  <span className="text-blue-900 dark:text-red-500 text-sm">
+                    *{errors.email.message}
+                  </span>
+                )}
+              </div>
+
+              {/* SUBMIT BUTTON */}
+              <button
+                type="submit"
+                className="bg-blue-600 w-max m-auto px-6 py-2 rounded text-white text-sm font-normal"
+              >
+                {/* IF LOADING IS TRUE THEN SHOW LOADER ELSE SUBMIT BUTTON */}
+                {loading ? <div className="loader "></div> : "Send OTP"}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </>

@@ -5,10 +5,12 @@ import { setSelectedUserMsgs } from "../../Store/Slices/message-slice";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setLoggedInUser } from "../../Store/Slices/auth-slice";
+import { useState } from "react";
 
 export const useFetchAndSend = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [messageLoading, setMessageLoading] = useState<boolean>(false);
 
   const { selectedUserMessages } = useSelector(
     (state: RootState) => state.message
@@ -17,6 +19,7 @@ export const useFetchAndSend = () => {
   //*Fetching user messages and images
   const fetchUserMessagesHandler = async (selectedUserId: string) => {
     try {
+      setMessageLoading(true);
       const response = await api.get(`/api/v1/message/${selectedUserId}`, {
         withCredentials: true,
       });
@@ -32,6 +35,8 @@ export const useFetchAndSend = () => {
       }
       dispatch(setLoggedInUser(null));
       navigate("/login");
+    } finally {
+      setMessageLoading(false);
     }
   };
 
@@ -70,5 +75,5 @@ export const useFetchAndSend = () => {
     }
   };
 
-  return { sendMessage, fetchUserMessagesHandler };
+  return { sendMessage, fetchUserMessagesHandler, messageLoading };
 };

@@ -84,21 +84,25 @@ const Navbar: React.FC = () => {
               />
             </li>
             <li className="sm:hidden">
-              <CiLogout
-                className={`size-6  hover:scale-105 duration-300 ${
-                  loading && "animate-pulse "
-                }`}
-                onClick={logoutHandler}
-              />
+              {loading ? (
+                <div className="border-t-2 border-b-2 rounded-full p-2 animate-spin"></div>
+              ) : (
+                <CiLogout
+                  className={`size-6  hover:scale-105 duration-300 `}
+                  onClick={logoutHandler}
+                />
+              )}
             </li>
           </ul>
           <div className="flex flex-col mb-4 items-center max-sm:hidden">
-            <CiLogout
-              className={`size-6  hover:scale-105 duration-300 ${
-                loading && "animate-pulse "
-              }`}
-              onClick={logoutHandler}
-            />
+            {loading ? (
+              <div className="border-t-2 border-b-2 rounded-full p-2 animate-spin"></div>
+            ) : (
+              <CiLogout
+                className={`size-6  hover:scale-105 duration-300 `}
+                onClick={logoutHandler}
+              />
+            )}
           </div>
         </nav>
       </div>

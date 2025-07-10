@@ -50,8 +50,8 @@ export const ChangePasswordPage = () => {
   };
 
   return (
-    <div className="sm:h-screen sm:grid sm:place-items-center max-sm:py-44">
-      <div className=" mx-auto max-w-lg relative flex flex-col p-4 rounded-3xl text-black shadow-purple-200 shadow-xl">
+    <div className="h-screen sm:grid sm:place-items-center max-sm:py-44 bg-[url('/loginbg.jpg')] bg-cover max-sm:bg-center">
+      <div className=" mx-auto max-w-lg relative flex flex-col p-4 rounded-3xl text-black border border-slate-200">
         <div className="text-3xl font-bold mb-2 text-[#1e0e4b] text-center sm:px-20">
           <span className="text-blue-600 font-bold text-4xl block">
             New Password

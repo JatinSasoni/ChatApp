@@ -51,10 +51,10 @@ export const VerifyOTPPage = () => {
 
   return (
     <>
-      <div className="sm:h-screen sm:grid sm:place-items-center max-sm:py-44">
-        <div className="mx-3 md:mx-auto max-w-lg relative flex flex-col p-4 rounded-3xl text-black md:bg-white shadow-black md:drop-shadow-xl ">
+      <div className="h-screen sm:grid sm:place-items-center max-sm:py-44 bg-[url('/loginbg.jpg')] bg-cover max-sm:bg-center ">
+        <div className="mx-3 md:mx-auto max-w-lg relative flex flex-col p-4 rounded-3xl text-black md:bg-white shadow-black md:drop-shadow-xl border-slate-200 border ">
           <div className="text-4xl font-bold mb-2 text-center">
-            <span className="text-blue-600 font-bold ">Enter 6 Digit OTP</span>
+            <span className="text-blue-700 font-bold ">Enter 6 Digit OTP</span>
           </div>
 
           {/* OTP */}
