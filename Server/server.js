@@ -17,63 +17,64 @@ configDotenv();
 const app = express();
 const server = http.createServer(app);
 
-//Middlewares
+// Middlewares
 const allowedOrigins = [
-  "http://localhost:5173/",
-  "https://quickchatpro.netlify.app/",
+  "http://localhost:5173",
+  "https://quickchatpro.netlify.app",
 ];
 
+// CORS configuration
 app.use(
   cors({
     origin: allowedOrigins,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-//SOCKET.io
+// Cookie parser should come before routes
+app.use(cookieParser());
+
+// Body parsers
+app.use(express.json({ limit: "4mb" }));
+app.use(urlencoded({ extended: true, limit: "4mb" }));
+
+// Socket.IO with matching CORS
 export const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: allowedOrigins, // Match Express CORS
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    credentials: true,
   },
 });
 
-//Store online users in server -> local variable
-export const userSocketMap = {}; // object containing {userID:SocketID}
+// Store online users in server -> local variable
+export const userSocketMap = {};
 
-//Socket.io connection handler
+// Socket.io connection handler
 io.on("connection", (socket) => {
-  //socket is client from frontend
-  const userId = socket.handshake.query.userId; //provided via frontend
+  const userId = socket.handshake.query.userId;
   console.log("user connected ", userId);
   if (userId) userSocketMap[userId] = socket.id;
 
-  //Emit currently online users to all connected clients
-  io.emit("getOnlineUsers", Object.keys(userSocketMap)); // keys are mongoose object id
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
     console.log("user disconnected ", userId);
-    //DELETE FROM SERVER
     delete userSocketMap[userId];
-
-    //EMIT OTHERS ABOUT DISCONNECTED OR OFFLINE USER
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
 
-app.use(cookieParser());
-app.use(express.json({ limit: "4mb" })); //DEFAULT IS 100KB
-app.use(urlencoded({ extended: true, limit: "4mb" }));
-
-//ROUTES
+// ROUTES
 app.use(express.static("./public"));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/message", messageRouter);
 
-//Central Error Middleware
+// Central Error Middleware
 app.use((err, req, res, next) => {
-  // Determine status code and message
   const statusCode = err.statusCode || 500;
   const message = err.message || "Something went wrong!";
   return res.status(statusCode).json({
@@ -83,15 +84,11 @@ app.use((err, req, res, next) => {
   });
 });
 
-//PORT
+// PORT
 const PORT = process.env.PORT || 7000;
 
-//Listen
+// Listen
 await connectToDB(process.env.MONGODB_URI);
-// transporter
-//   .verify()
-//   .then(() => console.log("Server is ready to send mails"))
-//   .catch((err) => console.log(err.message));
 server.listen(PORT, async () => {
   console.log(`Server started at PORT ${PORT}`);
 });
