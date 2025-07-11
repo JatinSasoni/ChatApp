@@ -94,6 +94,51 @@ export const rejectOrCancelFriendRequest = async (req, res, next) => {
   }
 };
 
+//* GET FRIEND REQUEST
+export const getFriendRequests = async (req, res, next) => {
+  try {
+    const selfID = req.user._id;
+    const friendRequests = await Friendship.find({
+      $or: [{ receiver: selfID }, { requester: selfID }],
+    }).populate("requester receiver", "-password");
+
+    if (!friendRequests) {
+      const error = new Error("No request found");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const totalFriends = friendRequests
+      .filter((friendDoc) => friendDoc.status === "accepted")
+      .map((friendDoc) => {
+        return friendDoc.receiver.toString() === selfID.toString()
+          ? friendDoc.requester
+          : friendDoc.receiver;
+      });
+    const requestReceived = friendRequests.filter((friendRequest) => {
+      return (
+        friendRequest.receiver._id.toString() === selfID.toString() &&
+        friendRequest.status === "pending"
+      );
+    });
+    const requestSent = friendRequests.filter((request) => {
+      return (
+        request.requester._id.toString() === selfID.toString() &&
+        request.status === "pending"
+      );
+    });
+
+    return res.status(200).json({
+      success: true,
+      requestReceived,
+      requestSent,
+      totalFriends,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 //* GET FRIENDS
 export const getAllFriends = async (req, res, next) => {
   try {

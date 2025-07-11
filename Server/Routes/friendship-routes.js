@@ -3,6 +3,7 @@ import { isAuthenticated } from "../Middleware/isAuthenticated.js";
 import {
   acceptFriendRequest,
   getAllFriends,
+  getFriendRequests,
   rejectOrCancelFriendRequest,
   sendFriendRequest,
 } from "../Controller/Friendship-Controller.js";
@@ -27,5 +28,6 @@ friendshipRoute.delete(
 );
 
 friendshipRoute.get("/get/friends", isAuthenticated, getAllFriends);
+friendshipRoute.get("/get/requests", isAuthenticated, getFriendRequests);
 
 export default friendshipRoute;

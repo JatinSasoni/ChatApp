@@ -1,6 +1,12 @@
 // components/RightSidebarContent.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import type { user } from "../../types/models";
+import { IoPersonAddSharp } from "react-icons/io5";
+import { api } from "../../Api/axios";
+import toast from "react-hot-toast";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../Store/store";
 
 type Props = {
   userSelected: user | null;
@@ -8,9 +14,62 @@ type Props = {
 };
 
 const RightSidebarContent: React.FC<Props> = ({ userSelected, msgImages }) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [alreadyFriend, setAlreadyFriend] = useState<boolean | undefined>(
+    false
+  );
+  const { friends } = useSelector((state: RootState) => state.message);
+
+  //sendRequestHandler
+  const sendRequestHandler = async (receiverId: string | undefined) => {
+    try {
+      setLoading(true);
+      const response = await api.post(
+        `/api/v1/friendship/send/${receiverId}/request`,
+        "",
+        {
+          withCredentials: true,
+        }
+      );
+      if (response?.data.success) {
+        toast.success(response.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const isFriend = friends?.some(
+      (friend) => friend._id === userSelected?._id
+    );
+
+    setAlreadyFriend(isFriend);
+  }, [userSelected, friends]);
+
   return (
     <div className="h-full">
-      <p className="text-xl">Profile</p>
+      <div className="flex justify-between px-2 ">
+        <p className="text-xl">Profile</p>
+        {alreadyFriend ? (
+          ""
+        ) : loading ? (
+          <div className="border-t-2 border-b-2 rounded-full p-3 animate-spin"></div>
+        ) : (
+          <button
+            onClick={() => sendRequestHandler(userSelected?._id)}
+            aria-label="Send Friend Request"
+          >
+            <IoPersonAddSharp className="my-auto hover:scale-110 duration-200 size-5" />
+          </button>
+        )}
+      </div>
       {/* PFP */}
       <div className="my-2 ">
         <img

@@ -44,7 +44,7 @@ const Signup = () => {
   };
 
   return (
-    <section className="bg-gray-50 h-screen max-sm:py-12 bg-[url('loginbg.jpg')] max-sm:bg-contain sm:bg-cover bg-repeat-round">
+    <section className="bg-gray-50 h-screen max-sm:py-12 bg-[url('loginbg.jpg')] bg-cover bg-repeat-round">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="flex items-center mb-6 text-2xl font-semibold text-gray-900">
           <img className="size-15 mr-4" src="/favicon.svg" alt="logo" />
