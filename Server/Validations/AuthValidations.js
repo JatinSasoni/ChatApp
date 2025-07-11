@@ -55,8 +55,8 @@ export const otpRouteValidation = [
     .escape(),
 ];
 
-const validateMongooseID = (userID) => {
-  const isValid = mongoose.isValidObjectId(userID);
+const validateMongooseID = (ID) => {
+  const isValid = mongoose.isValidObjectId(ID);
   if (!isValid) throw new Error("Invalid ID");
   return true;
 };
@@ -77,3 +77,7 @@ export const newPasswordValidation = [
     .withMessage("Password is not strong enough")
     .escape(),
 ];
+
+// export const validateReceiverID = [
+//   param("receiverId").custom((value) => validateMongooseID(value)),
+// ];

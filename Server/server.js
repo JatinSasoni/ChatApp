@@ -9,6 +9,7 @@ import http from "http";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { transporter } from "./utils/nodemailer.js";
+import friendshipRoute from "./Routes/friendship-routes.js";
 
 //Dot-env
 configDotenv();
@@ -72,6 +73,7 @@ app.use(express.static("./public"));
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/message", messageRouter);
+app.use("/api/v1/friendship", friendshipRoute);
 
 // Central Error Middleware
 app.use((err, req, res, next) => {
