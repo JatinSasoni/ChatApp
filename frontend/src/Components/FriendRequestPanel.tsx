@@ -1,73 +1,14 @@
-import { useEffect, useState } from "react";
-import { api } from "../../Api/axios";
-import axios from "axios";
-import toast from "react-hot-toast";
-import type { user } from "../../types/models";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { setFriends } from "../../Store/Slices/friends-slice";
 import FriendAndRequestCard from "./FriendAndRequestCard";
 
 const FriendRequestsPanel: React.FC = () => {
-  const dispatch = useDispatch();
-  const [requestSent, setRequestSent] = useState<user[]>([]);
-  const [requestReceived, setRequestReceived] = useState<user[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const { friends } = useSelector((state: RootState) => state.friendship);
-
-  // Fetch friend requests on mount
-  const fetchRequests = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get("/api/v1/friendship/get/requests", {
-        withCredentials: true,
-      });
-
-      if (res.data.success) {
-        dispatch(setFriends(res.data.totalFriends));
-        setRequestSent(res.data.requestSent);
-        setRequestReceived(res.data.requestReceived);
-      }
-
-      //store
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        toast.error(err.response?.data?.message || "Failed to fetch requests");
-      } else {
-        console.log(err);
-        toast.error("Unexpected error");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchRequests();
-  }, [dispatch]);
+  const { requestReceived, requestSent } = useSelector(
+    (state: RootState) => state.friendship
+  );
 
   return (
-    <div className="h-full">
-      {/* total friends */}
-      <div>
-        <h2 className="text-xl font-semibold mb-3">
-          Friends - {friends.length}
-        </h2>
-        <ul className="flex flex-col gap-4 overflow-y-auto max-h-[calc(100vh-150px)] pr-1">
-          {friends.map((friend) => {
-            return (
-              <FriendAndRequestCard
-                key={friend._id}
-                setLoading={setLoading}
-                user={friend}
-                actionType="unfriend"
-                onActionComplete={fetchRequests}
-                loading={loading}
-              />
-            );
-          })}
-        </ul>
-      </div>
-
+    <section className="my-4">
       {/* Request received */}
       <div>
         <h2 className="text-xl font-semibold mb-3">
@@ -78,12 +19,9 @@ const FriendRequestsPanel: React.FC = () => {
             return (
               <FriendAndRequestCard
                 key={requester._id}
-                setLoading={setLoading}
                 user={requester}
                 actionType="accept"
                 secondActionType="reject"
-                onActionComplete={fetchRequests}
-                loading={loading}
               />
             );
           })}
@@ -100,17 +38,14 @@ const FriendRequestsPanel: React.FC = () => {
             return (
               <FriendAndRequestCard
                 key={requested._id}
-                setLoading={setLoading}
                 user={requested}
                 actionType="cancel"
-                onActionComplete={fetchRequests}
-                loading={loading}
               />
             );
           })}
         </ul>
       </div>
-    </div>
+    </section>
   );
 };
 

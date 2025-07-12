@@ -1,7 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { CiUser, CiHome, CiLogout } from "react-icons/ci";
-import { BsPersonAdd } from "react-icons/bs";
 import {
   setLoggedInUser,
   setOnlineUsers,
@@ -84,12 +83,7 @@ const Navbar: React.FC = () => {
                 onClick={() => navigate("/profile")}
               />
             </li>
-            <li>
-              <BsPersonAdd
-                className="size-6 hover:scale-105 duration-300 "
-                onClick={() => navigate("/friends/request")}
-              />
-            </li>
+
             <li className="sm:hidden">
               {loading ? (
                 <div className="border-t-2 border-b-2 rounded-full p-2 animate-spin"></div>

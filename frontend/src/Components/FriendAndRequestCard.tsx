@@ -1,24 +1,20 @@
 import toast from "react-hot-toast";
 import { api } from "../../Api/axios";
 import type { user } from "../../types/models";
+import useFetchFriendshipData from "../Hooks/useFetchFriendshipData";
 
 type Props = {
   user: user;
-  loading: boolean;
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   actionType: "accept" | "cancel" | "unfriend";
   secondActionType?: "reject";
-  onActionComplete: () => Promise<void>;
 };
 
 const FriendAndRequestCard: React.FC<Props> = ({
   user,
-  setLoading,
   actionType,
   secondActionType,
-  onActionComplete,
-  loading,
 }) => {
+  const { loading, setLoading, fetchRequests } = useFetchFriendshipData();
   // Handle actions: accept, reject, cancel
   const handleAction = async (
     type: "accept" | "reject" | "cancel" | "unfriend",
@@ -30,13 +26,13 @@ const FriendAndRequestCard: React.FC<Props> = ({
         await api.patch(`/api/v1/friendship/accept/${requestId}/request`, "", {
           withCredentials: true,
         });
-        await onActionComplete();
+        fetchRequests();
         toast.success("Accepted");
       } else {
         await api.delete(`/api/v1/friendship/delete/${requestId}/request`, {
           withCredentials: true,
         });
-        await onActionComplete();
+        fetchRequests();
         toast.success(
           type === "cancel"
             ? "Cancelled"
@@ -67,7 +63,7 @@ const FriendAndRequestCard: React.FC<Props> = ({
   };
 
   return (
-    <li className="flex items-center justify-between bg-slate-100 p-3 rounded shadow-sm">
+    <li className="flex items-center justify-between bg-slate-100 p-3 rounded-xl shadow-sm">
       {/* User Info */}
       <div className="flex items-center gap-3">
         <img
@@ -86,7 +82,7 @@ const FriendAndRequestCard: React.FC<Props> = ({
         <button
           className={`${getButtonColor(
             actionType
-          )} text-white text-xs px-3 py-1 rounded w-16`}
+          )}  text-white text-xs px-3 py-1 rounded w-16`}
           onClick={() => handleAction(actionType, user._id)}
         >
           {loading ? <div className="animate-bounce">....</div> : actionType}
@@ -94,8 +90,8 @@ const FriendAndRequestCard: React.FC<Props> = ({
         {secondActionType && (
           <button
             className={`${getButtonColor(
-              actionType
-            )} text-white text-xs px-3 py-1 rounded`}
+              secondActionType
+            )}  text-white text-xs px-3 py-1 rounded`}
             onClick={() => handleAction(secondActionType, user._id)}
           >
             {loading ? (
