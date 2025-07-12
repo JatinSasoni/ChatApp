@@ -8,9 +8,10 @@ import SidebarUserCard from "./SidebarUserCard";
 
 const Sidebar: React.FC = () => {
   const [filter, setFilter] = useState<string>("");
-  const { allUsers, userSelected, friends } = useSelector(
+  const { allUsers, userSelected } = useSelector(
     (state: RootState) => state.message
   );
+  const { friends } = useSelector((state: RootState) => state.friendship);
 
   //* custom hook to fetch allUsers and Unseen messages
   useFetchUsers();

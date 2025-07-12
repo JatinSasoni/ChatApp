@@ -87,7 +87,7 @@ export const rejectOrCancelFriendRequest = async (req, res, next) => {
     }
     return res.status(200).json({
       success: true,
-      message: "Friend request accepted",
+      message: "removed",
     });
   } catch (error) {
     next(error);
@@ -95,7 +95,7 @@ export const rejectOrCancelFriendRequest = async (req, res, next) => {
 };
 
 //* GET FRIEND REQUEST
-export const getFriendRequests = async (req, res, next) => {
+export const getFriendsAndRequests = async (req, res, next) => {
   try {
     const selfID = req.user._id;
     const friendRequests = await Friendship.find({
@@ -110,23 +110,27 @@ export const getFriendRequests = async (req, res, next) => {
 
     const totalFriends = friendRequests
       .filter((friendDoc) => friendDoc.status === "accepted")
-      .map((friendDoc) => {
-        return friendDoc.receiver.toString() === selfID.toString()
+      .map((friendDoc) =>
+        friendDoc.receiver._id.toString() === selfID.toString()
           ? friendDoc.requester
-          : friendDoc.receiver;
-      });
-    const requestReceived = friendRequests.filter((friendRequest) => {
-      return (
-        friendRequest.receiver._id.toString() === selfID.toString() &&
-        friendRequest.status === "pending"
+          : friendDoc.receiver
       );
-    });
-    const requestSent = friendRequests.filter((request) => {
-      return (
-        request.requester._id.toString() === selfID.toString() &&
-        request.status === "pending"
-      );
-    });
+
+    const requestReceived = friendRequests
+      .filter(
+        (friendDoc) =>
+          friendDoc.receiver._id.toString() === selfID.toString() &&
+          friendDoc.status === "pending"
+      )
+      .map((friendDoc) => friendDoc.requester);
+
+    const requestSent = friendRequests
+      .filter(
+        (friendDoc) =>
+          friendDoc.requester._id.toString() === selfID.toString() &&
+          friendDoc.status === "pending"
+      )
+      .map((friendDoc) => friendDoc.receiver);
 
     return res.status(200).json({
       success: true,

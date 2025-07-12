@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { api } from "../../Api/axios";
 import {
   setAllUsers,
-  setFriends,
   setUnseenMessages,
 } from "../../Store/Slices/message-slice";
 import axios from "axios";
@@ -10,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import type { RootState } from "../../Store/store";
+import { setFriends } from "../../Store/Slices/friends-slice";
 
 export const useFetchUsers = () => {
   const dispatch = useDispatch();

@@ -6,7 +6,6 @@ interface messageState {
   userSelected: user | null;
   selectedUserMessages: Message[] | null;
   unseenMessages: UnseenMessages;
-  friends: user[] | null;
 }
 
 const initialState: messageState = {
@@ -14,7 +13,6 @@ const initialState: messageState = {
   userSelected: null,
   selectedUserMessages: null,
   unseenMessages: {},
-  friends: [],
 };
 
 const messageSlice = createSlice({
@@ -33,9 +31,6 @@ const messageSlice = createSlice({
     setUnseenMessages: (state, action: PayloadAction<UnseenMessages>) => {
       state.unseenMessages = action.payload;
     },
-    setFriends: (state, action: PayloadAction<user[] | null>) => {
-      state.friends = action.payload;
-    },
   },
 });
 
@@ -44,6 +39,5 @@ export const {
   setUserSelected,
   setSelectedUserMsgs,
   setUnseenMessages,
-  setFriends,
 } = messageSlice.actions;
 export default messageSlice.reducer;
