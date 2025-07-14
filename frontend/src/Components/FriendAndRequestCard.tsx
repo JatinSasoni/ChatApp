@@ -82,7 +82,7 @@ const FriendAndRequestCard: React.FC<Props> = ({
         <button
           className={`${getButtonColor(
             actionType
-          )}  text-white text-xs px-3 py-1 rounded w-16`}
+          )}  text-white text-xs px-2 py-1 rounded w-16`}
           onClick={() => handleAction(actionType, user._id)}
         >
           {loading ? <div className="animate-bounce">....</div> : actionType}

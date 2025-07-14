@@ -39,6 +39,7 @@ const MessagesContainer: React.FC = () => {
 
   //* custom-hook to listen/Subscribe to messages
   useListenMessage();
+  console.log("container");
 
   return (
     <section
@@ -77,15 +78,15 @@ const MessagesContainer: React.FC = () => {
 
           {/* Message List */}
           <div className="flex-1 overflow-y-auto px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover">
-            {messageLoading && (
+            {messageLoading ? (
               <div className="h-full grid place-items-center text-lg text-gray-500">
                 <span className="loader2" />
               </div>
+            ) : (
+              selectedUserMessages?.map((message: Message, index: number) => (
+                <MessageBox message={message} key={index} />
+              ))
             )}
-
-            {selectedUserMessages?.map((message: Message, index: number) => (
-              <MessageBox message={message} key={index} />
-            ))}
 
             {uploading && (
               <div className="text-center text-xs text-gray-400">

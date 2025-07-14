@@ -18,7 +18,7 @@ const RightSidebarContent: React.FC<Props> = ({ userSelected, msgImages }) => {
   const [alreadyFriend, setAlreadyFriend] = useState<boolean | undefined>(
     false
   );
-  const { friends } = useSelector((state: RootState) => state.message);
+  const { friends } = useSelector((state: RootState) => state.friendship);
 
   //sendRequestHandler
   const sendRequestHandler = async (receiverId: string | undefined) => {

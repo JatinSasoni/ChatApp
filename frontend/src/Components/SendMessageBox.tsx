@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react";
+import React, { useCallback, useState, type ChangeEvent } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
@@ -16,11 +16,11 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
   const { sendMessage } = useFetchAndSend(); //CUSTOM HOOK
 
   //* SEND MESSAGE HANDLER
-  const sendMessageHandler = () => {
+  const sendMessageHandler = useCallback(() => {
     if (input.trim() === "") return;
     sendMessage(input.trim(), userSelected?._id);
     setInput("");
-  };
+  }, [input, sendMessage, userSelected]);
 
   //* SEND IMAGE
   const sendImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,15 +41,24 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
     reader.readAsDataURL(file);
   };
 
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInput(e.target.value);
+    },
+    []
+  );
+
   return (
     <div className="flex m-1 p-1">
       <input
         type="text"
+        disabled={uploading}
+        autoComplete="off"
         className="w-full h-10 rounded-xl outline-none bg-neutral-100 pl-2 border"
         placeholder="Your message... "
         name="text"
         value={input}
-        onChange={(e) => setInput(e.target.value)}
+        onChange={handleInputChange}
         onKeyDown={(e) => (e.key === "Enter" ? sendMessageHandler() : null)}
       />
       <label htmlFor="image" className="mx-2 grid place-items-center">
@@ -70,4 +79,4 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
   );
 };
 
-export default SendMessageBox;
+export default React.memo(SendMessageBox);
