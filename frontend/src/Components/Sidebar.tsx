@@ -50,26 +50,30 @@ const Sidebar: React.FC = () => {
       </div>
       {/*Users */}
       <aside>
-        {!filteredUsers && (
-          <div className="animate-pulse text-center">Finding Users...</div>
+        {!filteredUsers ? (
+          <div className="animate-pulse text-center text-gray-500">
+            Loading Connections...
+          </div>
+        ) : (
+          <>
+            {/* friends */}
+            <p className="text-zinc-600">Friends - {filterFriends?.length}</p>
+
+            <ul className="flex flex-col gap-3 ">
+              {filterFriends?.map((user) => {
+                return <SidebarUserCard key={user._id} user={user} />;
+              })}
+            </ul>
+
+            {/* All-users */}
+            <p className="text-zinc-600 ">Users - {filteredUsers?.length}</p>
+            <ul className="flex flex-col gap-3 ">
+              {filteredUsers?.map((user) => {
+                return <SidebarUserCard key={user._id} user={user} />;
+              })}
+            </ul>
+          </>
         )}
-
-        {/* friends */}
-        <p className="text-zinc-600">Friends - {filterFriends?.length}</p>
-
-        <ul className="flex flex-col gap-3 ">
-          {filterFriends?.map((user) => {
-            return <SidebarUserCard key={user._id} user={user} />;
-          })}
-        </ul>
-
-        {/* All-users */}
-        <p className="text-zinc-600 ">Users - {filteredUsers?.length}</p>
-        <ul className="flex flex-col gap-3 ">
-          {filteredUsers?.map((user) => {
-            return <SidebarUserCard key={user._id} user={user} />;
-          })}
-        </ul>
       </aside>
     </div>
   );

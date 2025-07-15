@@ -39,7 +39,6 @@ const MessagesContainer: React.FC = () => {
 
   //* custom-hook to listen/Subscribe to messages
   useListenMessage();
-  console.log("container");
 
   return (
     <section
@@ -83,8 +82,8 @@ const MessagesContainer: React.FC = () => {
                 <span className="loader2" />
               </div>
             ) : (
-              selectedUserMessages?.map((message: Message, index: number) => (
-                <MessageBox message={message} key={index} />
+              selectedUserMessages?.map((message: Message) => (
+                <MessageBox message={message} key={message._id} />
               ))
             )}
 

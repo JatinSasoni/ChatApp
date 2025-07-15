@@ -102,7 +102,7 @@ const RightSidebarContent: React.FC<Props> = ({ userSelected, msgImages }) => {
                 key={index}
                 src={image}
                 alt="media"
-                className="hover:scale-105 duration-200 object-cover  min-[1400]:size-32 2xl:size-40 shadow-xl"
+                className="hover:scale-105 duration-200 object-cover min-[1400]:size-32 2xl:size-40 shadow-xl"
                 onClick={() => window.open(image)}
               />
             ))

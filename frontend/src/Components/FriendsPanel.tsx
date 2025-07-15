@@ -17,7 +17,7 @@ const FriendsPanel = () => {
       <div className="bg-white p-6 rounded-lg shadow-md h-full">
         <div className="flex gap-3 items-center py-2">
           <h2 className=" sm:text-2xl font-bold ">
-            Friends ({friends.length})
+            Friends ({filteredFriends.length})
           </h2>
           <input
             type="text"
@@ -44,7 +44,7 @@ const FriendsPanel = () => {
               No connections — start making friends!
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              Search users and send them a friend request.
+              You don't have such or any friends
             </p>
           </div>
         )}
