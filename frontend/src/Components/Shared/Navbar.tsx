@@ -1,6 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { CiUser, CiHome, CiLogout } from "react-icons/ci";
+import { GoPeople } from "react-icons/go";
+import { BsPeople } from "react-icons/bs";
+
 import {
   setLoggedInUser,
   setOnlineUsers,
@@ -81,6 +84,12 @@ const Navbar: React.FC = () => {
               <CiUser
                 className="size-6 hover:scale-105 duration-300 "
                 onClick={() => navigate("/profile")}
+              />
+            </li>
+            <li>
+              <GoPeople
+                className="size-5 hover:scale-105 duration-300 "
+                onClick={() => navigate("/groups")}
               />
             </li>
 

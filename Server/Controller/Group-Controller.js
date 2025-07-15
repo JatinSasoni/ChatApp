@@ -1,12 +1,14 @@
-import { Friendship } from "../Model/Friendship-model";
-import { GroupModel } from "../Model/Group-mode";
-import { MessageModel } from "../Model/Message-mode";
-import { uploadToCloudinary } from "../utils/cloudinary";
+import { Friendship } from "../Model/Friendship-model.js";
+import { GroupModel } from "../Model/Group-model.js";
+import { MessageModel } from "../Model/Message-mode.js";
+import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 //*POST REQ TO CREATE GROUP
 export const createGroup = async (req, res, next) => {
   try {
     const { groupName, members } = req.body;
+    console.log({ groupName, members });
+
     const userId = req.user._id;
 
     // Fetch only accepted friendships

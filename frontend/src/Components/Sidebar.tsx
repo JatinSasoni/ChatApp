@@ -35,7 +35,6 @@ const Sidebar: React.FC = () => {
       } p-2 min-w-52 min-[1400px]:min-w-70 overflow-y-scroll max-sm:h-[calc(100vh-56px)] sm:h-screen drop-shadow-md shadow-md duration-300`}
     >
       {/* Header */}
-
       <h2 className="text-2xl">Messages</h2>
       {/* Search Contact */}
       <div className="flex gap-2 bg-slate-100  rounded-xl items-center px-2 my-3 py-1 ">
