@@ -29,7 +29,7 @@ export const getAllUsers = async (req, res, next) => {
   });
 };
 
-//GET ALL MESSAGES FOR SELECTED USER
+//* GET ALL MESSAGES FOR SELECTED USER
 export const getSelectedUser = async (req, res, next) => {
   try {
     const userId = req.user._id;

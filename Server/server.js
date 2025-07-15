@@ -66,6 +66,21 @@ io.on("connection", (socket) => {
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
+
+  socket.on("joinGroup", ({ groupId, username }) => {
+    socket.join(groupId);
+    console.log(`User ${username} joined group ${groupId}`);
+    // Notify others in the room
+    socket.to(groupId).emit("userJoinedGroup", {
+      username,
+      userId,
+      groupId,
+    });
+  });
+  socket.on("leaveGroup", (groupId) => {
+    socket.leave(groupId);
+    console.log(`User ${socket.id} left group ${groupId}`);
+  });
 });
 
 // ROUTES
