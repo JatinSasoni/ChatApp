@@ -1,29 +1,35 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { CiSearch } from "react-icons/ci";
 import { api } from "../../Api/axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
+import { setAllGroups, setGroupSelected } from "../../Store/Slices/Group-slice";
 
-const GroupSidebar = (props: Props) => {
+const GroupSidebar = () => {
+  //*
+  const dispatch = useDispatch();
   const [filter, setFilter] = useState<string>("");
-  const [groupSelected, setGroupSelected] = useState(false);
-  const [group, setGroup] = useState([]);
-  const { loggedInUser } = useSelector((state: RootState) => state.auth);
-
-  const filterGroup = group.filter((group) => {
+  const { groups, groupSelected } = useSelector(
+    (state: RootState) => state.group
+  );
+  const filterGroup = groups.filter((group) => {
     return group.name.toLowerCase().includes(filter.toLowerCase());
   });
+
+  //*
+  const { loggedInUser } = useSelector((state: RootState) => state.auth);
+
   useEffect(() => {
     const fetchAllGroups = async () => {
       try {
         const response = await api.get("/api/v1/groups/my", {
           withCredentials: true,
         });
-        console.log(response);
+
         if (response.data.success) {
-          setGroup(response.data.allGroups);
+          dispatch(setAllGroups(response.data.allGroups));
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -34,7 +40,7 @@ const GroupSidebar = (props: Props) => {
     if (loggedInUser) {
       fetchAllGroups();
     }
-  }, [loggedInUser]);
+  }, [loggedInUser, dispatch]);
 
   return (
     <div
@@ -64,11 +70,15 @@ const GroupSidebar = (props: Props) => {
         ) : (
           <>
             {/* Groups */}
-            <p className="text-zinc-600 ">Groups - {group?.length}</p>
+            <p className="text-zinc-600 ">Groups - {filterGroup?.length}</p>
             <ul className="flex flex-col gap-3 ">
-              {filterGroup.map((group) => {
+              {filterGroup?.map((group) => {
                 return (
-                  <li className="cursor-pointer group" key={group._id}>
+                  <li
+                    className="cursor-pointer group"
+                    key={group._id}
+                    onClick={() => dispatch(setGroupSelected(group))}
+                  >
                     <div className="flex p-1 gap-2">
                       <div className="min-w-10">
                         {/* <img

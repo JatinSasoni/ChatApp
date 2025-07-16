@@ -13,6 +13,7 @@ export interface user {
 export interface Message {
   senderId: string;
   receiverId: string;
+  groupId: string;
   text: string;
   createdAt: string;
   _id: string;

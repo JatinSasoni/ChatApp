@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { type user } from "../../types/models.js";
+import { setUnseenMessages, setUserSelected } from "./message-slice";
+import type { Message, UnseenMessages } from "../../types/models";
 
 export interface Group {
   _id: string;
@@ -10,28 +11,39 @@ export interface Group {
 }
 
 interface state {
-  groups: Group;
+  groups: Group[];
+  groupSelected: Group | null;
+  selectedGroupMessages: Message[];
+  unseenMessages: UnseenMessages;
 }
 
 const initialState: state = {
   groups: [],
+  groupSelected: null,
+  selectedGroupMessages: [],
+  unseenMessages: {},
 };
-const friendsSlice = createSlice({
-  name: "friends",
+
+const groupSlice = createSlice({
+  name: "group",
   initialState,
   reducers: {
-    setFriends: (state, action: PayloadAction<user[]>) => {
-      state.friends = action.payload;
+    setAllGroups: (state, action: PayloadAction<Group[]>) => {
+      state.groups = action.payload;
     },
-    setRequestSent: (state, action: PayloadAction<user[]>) => {
-      state.requestSent = action.payload;
+    setGroupSelected: (state, action: PayloadAction<Group | null>) => {
+      state.groupSelected = action.payload;
     },
-    setRequestReceived: (state, action: PayloadAction<user[]>) => {
-      state.requestReceived = action.payload;
+    setSelectedGroupMessages: (state, action: PayloadAction<Message[]>) => {
+      state.selectedGroupMessages = action.payload;
     },
+    // setUnseenMessages: (state, action: PayloadAction<Message[]>) => {
+    //   state.selectedGroupMessages = action.payload;
+    // },
   },
 });
 
-export const { setFriends, setRequestSent, setRequestReceived } =
-  friendsSlice.actions;
-export default friendsSlice.reducer;
+export const { setAllGroups, setGroupSelected, setSelectedGroupMessages } =
+  groupSlice.actions;
+
+export default groupSlice.reducer;

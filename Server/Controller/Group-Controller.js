@@ -1,6 +1,7 @@
 import { Friendship } from "../Model/Friendship-model.js";
 import { GroupModel } from "../Model/Group-model.js";
 import { MessageModel } from "../Model/Message-mode.js";
+import { io } from "../server.js";
 import { uploadToCloudinary } from "../utils/cloudinary.js";
 
 //*POST REQ TO CREATE GROUP
@@ -50,7 +51,7 @@ export const getAllGroups = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const allGroups = await GroupModel.find({
-      admin: userId,
+      members: userId,
     });
     return res.status(200).json({ success: true, allGroups });
   } catch (error) {
@@ -103,7 +104,7 @@ export const addMembersToGroup = async (req, res, next) => {
   }
 };
 
-//* POSt REQ TO SEND MESSAGE TO GROUP
+//* POST REQ TO SEND MESSAGE TO GROUP
 export const sendMessageToGroup = async (req, res, next) => {
   try {
     const userId = req.user._id;
@@ -133,17 +134,18 @@ export const sendMessageToGroup = async (req, res, next) => {
     });
     //socket------
     //  Socket emit to group
-    const io = req.app.get("io"); //  io in app.js
     io.to(groupId).emit("groupMessage", {
-      message: messageDoc,
+      newMessage: messageDoc,
       groupId,
     });
 
     return res.status(201).json({
       success: true,
-      message: messageDoc,
+      newMessage: messageDoc,
     });
   } catch (error) {
+    console.log(error);
+
     next(error);
   }
 };
@@ -154,8 +156,9 @@ export const getGroupMessages = async (req, res, next) => {
     const userId = req.user._id;
     const { groupId } = req.params;
     const group = await GroupModel.findById(groupId);
+
     const isMember = group.members.some(
-      (member) => member === userId.toString()
+      (member) => member.toString() === userId.toString()
     );
     if (!isMember) {
       const error = new Error("You are not a member");
@@ -164,12 +167,16 @@ export const getGroupMessages = async (req, res, next) => {
     }
     const messages = await MessageModel.find({
       groupId: groupId,
-    }).populate("senderId", "-password");
+    });
+    // .populate("senderId", "-password");
+
     return res.status(200).json({
       success: true,
       messages: messages,
     });
   } catch (error) {
+    console.log(error);
+
     next(error);
   }
 };

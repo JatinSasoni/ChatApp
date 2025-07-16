@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import authSlice from "./Slices/auth-slice";
 import messageSlice from "./Slices/message-slice";
 import friendSlice from "./Slices/friends-slice";
+import groupSlice from "./Slices/Group-slice";
 
 export const store = configureStore({
   reducer: {
     auth: authSlice,
     message: messageSlice,
     friendship: friendSlice,
+    group: groupSlice,
   },
 });
 
