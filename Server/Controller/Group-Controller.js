@@ -46,14 +46,29 @@ export const createGroup = async (req, res, next) => {
   }
 };
 
-//* GET REQ TO GET GROUPS
+//* GET REQ TO GET GROUPS AND UNSEEN MESSAGES
 export const getAllGroups = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const allGroups = await GroupModel.find({
       members: userId,
+    })
+      .populate("admin", "username")
+      .populate("members", "Profile username");
+
+    const unseenMessages = {};
+    const promises = allGroups.map(async (group) => {
+      const messages = await MessageModel.find({
+        groupId: group._id,
+        senderId: { $ne: userId },
+        seen: false,
+      });
+      if (messages.length > 0) {
+        unseenMessages[group._id.toString()] = messages.length;
+      }
     });
-    return res.status(200).json({ success: true, allGroups });
+    await Promise.all(promises);
+    return res.status(200).json({ success: true, allGroups, unseenMessages });
   } catch (error) {
     next(error);
   }

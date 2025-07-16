@@ -27,7 +27,7 @@ export const useListenGroupMessage = () => {
               ])
             );
 
-            //MARKING MESSAGE AS SEEN ON BACKEND
+            // MARKING MESSAGE AS SEEN ON BACKEND
             // await api.put(`/api/v1/message/mark/${newMessage._id}`, "", {
             //   headers: {
             //     Authorization: `Bearer ${localStorage.getItem("token")}`,

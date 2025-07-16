@@ -3,78 +3,43 @@ import type { RootState } from "../../Store/store";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBackSharp } from "react-icons/io5";
 import {
-  useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
   type ChangeEvent,
 } from "react";
-import { api } from "../../Api/axios";
-import {
-  setGroupSelected,
-  setSelectedGroupMessages,
-} from "../../Store/Slices/Group-slice";
-import axios from "axios";
+import { setGroupSelected } from "../../Store/Slices/Group-slice";
 import MessageBox from "./MessageBox";
 import type { Message } from "../../types/models";
 import { useListenGroupMessage } from "../Hooks/useListenGroupMessages";
 import { socketContext } from "../../ContextForSocket/context";
 import { TfiGallery } from "react-icons/tfi";
-import { setLoggedInUser } from "../../Store/Slices/auth-slice";
+import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
 
 const GroupContainer = () => {
   const { groupSelected, selectedGroupMessages } = useSelector(
     (state: RootState) => state.group
   );
-  const { loggedInUser } = useSelector((state: RootState) => state.auth);
-  const [input, setInput] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const { loggedInUser } = useSelector((state: RootState) => state.auth);
+  const [input, setInput] = useState("");
   const [uploading, setUploading] = useState<boolean>(false);
   const divTillScroll = useRef<HTMLDivElement>(null);
-  const { onlineUsers } = useSelector((state: RootState) => state.auth);
-  const [messageLoading, setMessageLoading] = useState<boolean>(false);
+  // const { onlineUsers } = useSelector((state: RootState) => state.auth);
+  const { fetchGroupMessages, groupMessageLoading, sendMessageGroup } =
+    useFetchAndSend();
+
+  const SocketContext = useContext(socketContext);
 
   //* useEffect to fetch selected group messages
   useEffect(() => {
     //*Fetching group messages and images
-    const fetchGroupMessages = async (groupId: string | undefined) => {
-      try {
-        setMessageLoading(true);
-        const response = await api.get(
-          `/api/v1/groups/messages/group/${groupId}`,
-          {
-            withCredentials: true,
-          }
-        );
-
-        console.log(response.data.message);
-
-        if (response.data.success) {
-          dispatch(setSelectedGroupMessages(response?.data?.messages));
-        }
-      } catch (error) {
-        console.log(error);
-
-        //*Type guard
-        if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
-        } else {
-          console.log("An unexpected error occurred:", error);
-        }
-        // dispatch(setLoggedInUser(null));
-        // navigate("/login");
-      } finally {
-        setMessageLoading(false);
-      }
-    };
-
     if (groupSelected) {
       fetchGroupMessages(groupSelected?._id);
     }
-  }, [groupSelected, dispatch, navigate, groupSelected?._id]);
+  }, [groupSelected]);
 
   //* useEffect to scroll to latest message
   useEffect(() => {
@@ -85,9 +50,15 @@ const GroupContainer = () => {
     }
   }, [groupSelected, selectedGroupMessages, uploading]);
 
-  //* custom-hook to listen/Subscribe to messages
+  //* custom-hook to listen/Subscribe to group messages
   useListenGroupMessage();
-  const SocketContext = useContext(socketContext);
+
+  //* SEND MESSAGE HANDLER
+  const sendMessageHandler = () => {
+    if (input.trim() === "") return;
+    sendMessageGroup(input.trim(), groupSelected?._id);
+    setInput("");
+  };
 
   //Join to group
   useEffect(() => {
@@ -99,52 +70,6 @@ const GroupContainer = () => {
     }
   }, [groupSelected?._id, SocketContext, loggedInUser]);
 
-  //*sendMessageHandler
-  const sendMessage = useCallback(
-    async (
-      input: string,
-      selectedGroupId: string | undefined,
-      image?: string | ArrayBuffer | null
-    ) => {
-      if (!input && !image) return;
-      try {
-        const response = await api.post(
-          // /messages/send/group/:groupId
-          `/api/v1/groups/messages/send/group/${selectedGroupId}`,
-          { message: input, image: image },
-          {
-            withCredentials: true,
-          }
-        );
-        console.log(response);
-
-        if (response?.data?.success) {
-          dispatch(
-            setSelectedGroupMessages([
-              ...(selectedGroupMessages || []), //COZ TYPE OF selectedGroupMessages could be of null type
-              response.data.newMessage,
-            ])
-          );
-        }
-      } catch (error) {
-        //*Type guard
-        if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
-        } else {
-          console.log("An unexpected error occurred:", error);
-        }
-        dispatch(setLoggedInUser(null));
-      }
-    },
-    [dispatch, selectedGroupMessages]
-  );
-
-  //* SEND MESSAGE HANDLER
-  const sendMessageHandler = () => {
-    if (input.trim() === "") return;
-    sendMessage(input.trim(), groupSelected?._id);
-    setInput("");
-  };
   //* SEND IMAGE
   const sendImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target?.files?.[0];
@@ -157,7 +82,7 @@ const GroupContainer = () => {
     reader.onloadend = async () => {
       setUploading(true);
       const result = reader.result as string;
-      await sendMessage("", groupSelected?._id, result);
+      await sendMessageGroup("", groupSelected?._id, result);
       e.target.value = "";
       setUploading(false);
     };
@@ -166,7 +91,7 @@ const GroupContainer = () => {
 
   return (
     <section
-      className={`h-screen w-full flex flex-col bg-white rounded-lg shadow-md transition-all
+      className={`h-screen max-w-6xl flex flex-col bg-white rounded-lg shadow-md transition-all
   ${
     groupSelected
       ? "min-[1430px]:min-w-[868px] max-[1430px]:min-w-[760px] max-[1270px]:min-w-[660px] max-[900px]:min-w-full"
@@ -201,7 +126,7 @@ const GroupContainer = () => {
 
           {/* Message List */}
           <div className="flex-1 overflow-y-auto px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover">
-            {messageLoading ? (
+            {groupMessageLoading ? (
               <div className="h-full grid place-items-center text-lg text-gray-500">
                 <span className="loader2" />
               </div>

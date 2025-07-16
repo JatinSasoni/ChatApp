@@ -6,17 +6,24 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setLoggedInUser } from "../../Store/Slices/auth-slice";
 import { useCallback, useState } from "react";
+import { setSelectedGroupMessages } from "../../Store/Slices/Group-slice";
 
 export const useFetchAndSend = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [messageLoading, setMessageLoading] = useState<boolean>(false);
+  const [groupMessageLoading, setGroupMessageLoading] =
+    useState<boolean>(false);
+
+  const { selectedGroupMessages } = useSelector(
+    (state: RootState) => state.group
+  );
 
   const { selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );
 
-  //*Fetching user messages and images
+  //* Fetching user messages and images
   const fetchUserMessagesHandler = useCallback(
     async (selectedUserId: string) => {
       try {
@@ -43,7 +50,7 @@ export const useFetchAndSend = () => {
     [dispatch, navigate]
   );
 
-  //*sendMessageHandler
+  //*sendMessageHandler for one-to-one chat
   const sendMessage = useCallback(
     async (
       input: string,
@@ -80,5 +87,77 @@ export const useFetchAndSend = () => {
     [dispatch, selectedUserMessages]
   );
 
-  return { sendMessage, fetchUserMessagesHandler, messageLoading };
+  //* Fetching group messages and images
+  const fetchGroupMessages = async (groupId: string | undefined) => {
+    try {
+      setGroupMessageLoading(true);
+      const response = await api.get(
+        `/api/v1/groups/messages/group/${groupId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      if (response.data.success) {
+        dispatch(setSelectedGroupMessages(response?.data?.messages));
+      }
+    } catch (error) {
+      //*Type guard
+      if (axios.isAxiosError(error)) {
+        console.log(error.response?.data);
+      } else {
+        console.log("An unexpected error occurred:", error);
+      }
+      // dispatch(setLoggedInUser(null));
+      // navigate("/login");
+    } finally {
+      setGroupMessageLoading(false);
+    }
+  };
+
+  //*sendMessageHandler for group-chat
+  const sendMessageGroup = useCallback(
+    async (
+      input: string,
+      selectedGroupId: string | undefined,
+      image?: string | ArrayBuffer | null
+    ) => {
+      if (!input && !image) return;
+      try {
+        const response = await api.post(
+          `/api/v1/groups/messages/send/group/${selectedGroupId}`,
+          { message: input, image: image },
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (response?.data?.success) {
+          dispatch(
+            setSelectedGroupMessages([
+              ...(selectedGroupMessages || []), // COZ TYPE OF selectedGroupMessages could be of null type
+              response.data.newMessage,
+            ])
+          );
+        }
+      } catch (error) {
+        //*Type guard
+        if (axios.isAxiosError(error)) {
+          console.log(error.response?.data);
+        } else {
+          console.log("An unexpected error occurred:", error);
+        }
+        dispatch(setLoggedInUser(null));
+      }
+    },
+    [dispatch, selectedGroupMessages]
+  );
+
+  return {
+    sendMessage,
+    fetchUserMessagesHandler,
+    messageLoading,
+    groupMessageLoading,
+    fetchGroupMessages,
+    sendMessageGroup,
+  };
 };

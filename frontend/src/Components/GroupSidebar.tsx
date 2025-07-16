@@ -1,46 +1,23 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { api } from "../../Api/axios";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { setAllGroups, setGroupSelected } from "../../Store/Slices/Group-slice";
+import { setGroupSelected } from "../../Store/Slices/Group-slice";
+import useFetchAllGroups from "../Hooks/useFetchAllGroups";
 
 const GroupSidebar = () => {
-  //*
   const dispatch = useDispatch();
   const [filter, setFilter] = useState<string>("");
-  const { groups, groupSelected } = useSelector(
+  const { groups, groupSelected, unseenMessages } = useSelector(
     (state: RootState) => state.group
   );
   const filterGroup = groups.filter((group) => {
     return group.name.toLowerCase().includes(filter.toLowerCase());
   });
 
-  //*
-  const { loggedInUser } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    const fetchAllGroups = async () => {
-      try {
-        const response = await api.get("/api/v1/groups/my", {
-          withCredentials: true,
-        });
-
-        if (response.data.success) {
-          dispatch(setAllGroups(response.data.allGroups));
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          toast.error(error.response?.data.message);
-        }
-      }
-    };
-    if (loggedInUser) {
-      fetchAllGroups();
-    }
-  }, [loggedInUser, dispatch]);
+  //* custom hook to fetch allGroups
+  //! fetch unseen messages also
+  useFetchAllGroups();
 
   return (
     <div
@@ -94,16 +71,16 @@ const GroupSidebar = () => {
                           </p>
                           <p className={`text-xs `}></p>
                         </div>
-                        {/* <div
+                        <div
                           className={`bg-purple-300 rounded-full size-5 grid place-items-center ${
-                            !unseenMessages[user._id] && "hidden"
+                            !unseenMessages[group._id] && "hidden"
                           }`}
                         >
                           <span className="text-sm">
-                            {unseenMessages[user._id] &&
-                              unseenMessages[user._id]}
+                            {unseenMessages[group._id] &&
+                              unseenMessages[group._id]}
                           </span>
-                        </div> */}
+                        </div>
                       </div>
                     </div>
                   </li>

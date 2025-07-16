@@ -2,11 +2,9 @@
 import React, { useEffect, useState } from "react";
 import type { user } from "../../types/models";
 import { IoPersonAddSharp } from "react-icons/io5";
-import { api } from "../../Api/axios";
-import toast from "react-hot-toast";
-import axios from "axios";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
+import useSendFriendRequest from "../Hooks/useSendFriendRequest";
 
 type Props = {
   userSelected: user | null;
@@ -14,36 +12,12 @@ type Props = {
 };
 
 const RightSidebarContent: React.FC<Props> = ({ userSelected, msgImages }) => {
-  const [loading, setLoading] = useState<boolean>(false);
   const [alreadyFriend, setAlreadyFriend] = useState<boolean | undefined>(
     false
   );
   const { friends } = useSelector((state: RootState) => state.friendship);
 
-  //sendRequestHandler
-  const sendRequestHandler = async (receiverId: string | undefined) => {
-    try {
-      setLoading(true);
-      const response = await api.post(
-        `/api/v1/friendship/send/${receiverId}/request`,
-        "",
-        {
-          withCredentials: true,
-        }
-      );
-      if (response?.data.success) {
-        toast.success(response.data.message);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data.message);
-      } else {
-        toast.error("An unexpected error occurred");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { loading, sendRequestHandler } = useSendFriendRequest();
 
   useEffect(() => {
     const isFriend = friends?.some(

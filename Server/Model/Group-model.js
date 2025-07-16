@@ -15,6 +15,13 @@ const groupSchema = new Schema(
         ref: "user",
       },
     ],
+    profile: {
+      bio: { type: String },
+      profilePhoto: {
+        type: String,
+        default: "/avatar_icon.png",
+      },
+    },
     messages: [
       {
         type: Schema.Types.ObjectId,
