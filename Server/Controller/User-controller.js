@@ -3,24 +3,24 @@ import { UserModel } from "../Model/User-model.js";
 import cloudinary, { uploadToCloudinary } from "../utils/cloudinary.js";
 import { io, userSocketMap } from "../server.js";
 
-//GET ALL USERS AND UNSEEN MESSAGES
-export const getAllUsers = async (req, res, next) => {
+//GET ALL USERS AND UNseenBy MESSAGES
+export const getAllUsersAndUnseenMsgs = async (req, res, next) => {
   const user = req.user;
-
   //GET ALL USERS EXCEPT YOURSELF
   const filteredUser = await UserModel.find({ _id: { $ne: user._id } });
   const unseenMessages = {};
   const promises = filteredUser.map(async (otherUser) => {
-    const messages = await MessageModel.find({
+    const unseenCount = await MessageModel.countDocuments({
       senderId: otherUser._id,
       receiverId: user._id,
-      seen: false,
+      seenBy: { $ne: user._id }, // not yet seen by current user
     });
 
-    if (messages.length > 0) {
-      unseenMessages[otherUser._id] = messages.length;
+    if (unseenCount > 0) {
+      unseenMessages[otherUser._id] = unseenCount;
     }
   });
+
   await Promise.all(promises);
   res.status(200).json({
     success: true,
@@ -34,6 +34,7 @@ export const getSelectedUser = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const selectedUserId = req.params.id;
+
     //FETCH ALL SELECTED USERS MESSAGES
     const selectedUserMessages = await MessageModel.find({
       $or: [
@@ -41,17 +42,34 @@ export const getSelectedUser = async (req, res, next) => {
         { senderId: selectedUserId, receiverId: userId },
       ],
     });
-    //MARK MESSAGES SEEN
+    // Mark messages from selected user as seen
     await MessageModel.updateMany(
       {
         senderId: selectedUserId,
         receiverId: userId,
+        seenBy: { $ne: userId }, // Only update if not already seen
       },
-      { seen: true }
+      { $push: { seenBy: userId } }
     );
+
     return res.status(200).json({ success: true, selectedUserMessages });
   } catch (error) {
     console.log(error);
+    next(error);
+  }
+};
+
+//* API TO MARK MESSAGES SEEN USING MESSAGE-ID
+export const markMessagesSeen = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const messageId = req.params.messageId;
+    await MessageModel.updateOne(
+      { _id: messageId, seenBy: { $ne: user._id } }, // only if not already seen
+      { $push: { seenBy: user._id } }
+    );
+    return res.status(200).json({ success: true });
+  } catch (error) {
     next(error);
   }
 };
@@ -91,18 +109,6 @@ export const updateProfile = async (req, res) => {
     console.log("ERROR WHILE UPDATING PROFILE");
     console.log(error);
 
-    next(error);
-  }
-};
-
-//API TO MARK MESSAGES SEEN USING MESSAGE-ID
-export const markMessagesSeen = async (req, res, next) => {
-  try {
-    const messageId = req.params.messageId;
-    await MessageModel.findByIdAndUpdate(messageId, { seen: true });
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    console.log(error);
     next(error);
   }
 };

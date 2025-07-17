@@ -2,7 +2,10 @@ import { useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { setGroupSelected } from "../../Store/Slices/Group-slice";
+import {
+  setGroupSelected,
+  setUnseenMessages,
+} from "../../Store/Slices/Group-slice";
 import useFetchAllGroups from "../Hooks/useFetchAllGroups";
 
 const GroupSidebar = () => {
@@ -16,7 +19,6 @@ const GroupSidebar = () => {
   });
 
   //* custom hook to fetch allGroups
-  //! fetch unseen messages also
   useFetchAllGroups();
 
   return (
@@ -54,7 +56,12 @@ const GroupSidebar = () => {
                   <li
                     className="cursor-pointer group"
                     key={group._id}
-                    onClick={() => dispatch(setGroupSelected(group))}
+                    onClick={() => {
+                      dispatch(setGroupSelected(group));
+                      dispatch(
+                        setUnseenMessages({ ...unseenMessages, [group._id]: 0 })
+                      );
+                    }}
                   >
                     <div className="flex p-1 gap-2">
                       <div className="min-w-10">

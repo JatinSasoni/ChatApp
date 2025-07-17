@@ -2,20 +2,15 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBackSharp } from "react-icons/io5";
-import {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-} from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { setGroupSelected } from "../../Store/Slices/Group-slice";
 import MessageBox from "./MessageBox";
 import type { Message } from "../../types/models";
 import { useListenGroupMessage } from "../Hooks/useListenGroupMessages";
-import { socketContext } from "../../ContextForSocket/context";
 import { TfiGallery } from "react-icons/tfi";
 import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
+import useJoinAllGroups from "../Hooks/useJoinLeaveGroup";
+import CreateGroup from "./CreateGroup";
 
 const GroupContainer = () => {
   const { groupSelected, selectedGroupMessages } = useSelector(
@@ -23,15 +18,12 @@ const GroupContainer = () => {
   );
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loggedInUser } = useSelector((state: RootState) => state.auth);
   const [input, setInput] = useState("");
   const [uploading, setUploading] = useState<boolean>(false);
   const divTillScroll = useRef<HTMLDivElement>(null);
   // const { onlineUsers } = useSelector((state: RootState) => state.auth);
   const { fetchGroupMessages, groupMessageLoading, sendMessageGroup } =
     useFetchAndSend();
-
-  const SocketContext = useContext(socketContext);
 
   //* useEffect to fetch selected group messages
   useEffect(() => {
@@ -61,14 +53,7 @@ const GroupContainer = () => {
   };
 
   //Join to group
-  useEffect(() => {
-    if (SocketContext?.socket) {
-      SocketContext.socket.emit("joinGroup", {
-        groupId: groupSelected?._id,
-        username: loggedInUser?.username,
-      });
-    }
-  }, [groupSelected?._id, SocketContext, loggedInUser]);
+  useJoinAllGroups();
 
   //* SEND IMAGE
   const sendImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -181,16 +166,7 @@ const GroupContainer = () => {
         </div>
       ) : (
         // Empty state when no user selected
-        <div className="hidden sm:flex flex-col items-center justify-center w-full h-full bg-gray-100 p-6">
-          <img
-            src="/logo_big.svg"
-            alt="Chat Logo"
-            className="w-80 mb-4 drop-shadow-md"
-          />
-          <p className="text-gray-500 text-sm">
-            Select a conversation to get started
-          </p>
-        </div>
+        <CreateGroup />
       )}
     </section>
   );

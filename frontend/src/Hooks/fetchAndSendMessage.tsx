@@ -41,8 +41,8 @@ export const useFetchAndSend = () => {
         } else {
           console.log("An unexpected error occurred:", error);
         }
-        dispatch(setLoggedInUser(null));
-        navigate("/login");
+        // dispatch(setLoggedInUser(null));
+        // navigate("/login");
       } finally {
         setMessageLoading(false);
       }

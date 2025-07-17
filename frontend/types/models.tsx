@@ -17,7 +17,7 @@ export interface Message {
   text: string;
   createdAt: string;
   _id: string;
-  seen: boolean;
+  seenBy: string[];
   image: string;
 }
 

@@ -11,6 +11,7 @@ import cookieParser from "cookie-parser";
 import { transporter } from "./utils/nodemailer.js";
 import friendshipRoute from "./Routes/friendship-routes.js";
 import groupRouter from "./Routes/group-routes.js";
+import { log } from "console";
 
 //Dot-env
 configDotenv();
@@ -68,19 +69,18 @@ io.on("connection", (socket) => {
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 
-  socket.on("joinGroup", ({ groupId, username }) => {
-    socket.join(groupId);
-    console.log(`User ${username} joined group ${groupId}`);
-    // Notify others in the room
-    socket.to(groupId).emit("userJoinedGroup", {
-      username,
-      userId,
-      groupId,
+  socket.on("joinMultipleGroups", ({ groupIds, username }) => {
+    groupIds.forEach((groupId) => {
+      socket.join(groupId);
     });
+    console.log(`${username} joined groups:`, groupIds);
   });
-  socket.on("leaveGroup", (groupId) => {
-    socket.leave(groupId);
-    console.log(`User ${socket.id} left group ${groupId}`);
+
+  socket.on("leaveMultipleGroups", ({ groupIds, username }) => {
+    groupIds.forEach((groupId) => {
+      socket.leave(groupId);
+    });
+    console.log(`${username} left groups:`, groupIds);
   });
 });
 

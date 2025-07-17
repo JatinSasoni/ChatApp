@@ -17,13 +17,14 @@ const Group = () => {
     <section className="flex">
       <Navbar />
       <GroupSidebar />
-      {groupSelected ? (
+      <GroupContainer />
+      {/* {groupSelected ? (
         <>
           <GroupContainer /> <GroupRightSideBar />
         </>
       ) : (
         <CreateGroup />
-      )}
+      )} */}
     </section>
   );
 };

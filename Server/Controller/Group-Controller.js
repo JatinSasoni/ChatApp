@@ -47,7 +47,7 @@ export const createGroup = async (req, res, next) => {
 };
 
 //* GET REQ TO GET GROUPS AND UNSEEN MESSAGES
-export const getAllGroups = async (req, res, next) => {
+export const getAllGroupsAndUnseenMsgs = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const allGroups = await GroupModel.find({
@@ -58,17 +58,71 @@ export const getAllGroups = async (req, res, next) => {
 
     const unseenMessages = {};
     const promises = allGroups.map(async (group) => {
-      const messages = await MessageModel.find({
+      const unseenCount = await MessageModel.countDocuments({
         groupId: group._id,
         senderId: { $ne: userId },
-        seen: false,
+        seenBy: { $ne: userId },
       });
-      if (messages.length > 0) {
-        unseenMessages[group._id.toString()] = messages.length;
+
+      if (unseenCount > 0) {
+        unseenMessages[group._id] = unseenCount;
       }
     });
     await Promise.all(promises);
     return res.status(200).json({ success: true, allGroups, unseenMessages });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//* GET /api/messages/group/:groupId
+export const getGroupMessages = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const { groupId } = req.params;
+    const group = await GroupModel.findById(groupId);
+
+    const isMember = group.members.includes(userId);
+    if (!isMember) {
+      const error = new Error("You are not a member");
+      error.statusCode = 400;
+      throw error;
+    }
+    const messages = await MessageModel.find({
+      groupId: groupId,
+    });
+    // .populate("senderId", "-password");
+
+    // Mark messages from selected group as seen by user
+    await MessageModel.updateMany(
+      {
+        groupId: groupId,
+        seenBy: { $ne: userId }, // Only update if not already seen
+      },
+      { $push: { seenBy: userId } }
+    );
+
+    return res.status(200).json({
+      success: true,
+      messages: messages,
+    });
+  } catch (error) {
+    console.log(error);
+
+    next(error);
+  }
+};
+
+//* API TO MARK MESSAGES SEEN USING MESSAGE-ID (GROUP)
+export const markMessagesSeenGroup = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const messageId = req.params.messageId;
+    await MessageModel.updateOne(
+      { _id: messageId, seenBy: { $ne: user._id } }, // only if not already seen
+      { $push: { seenBy: user._id } }
+    );
+    return res.status(200).json({ success: true });
   } catch (error) {
     next(error);
   }
@@ -151,43 +205,11 @@ export const sendMessageToGroup = async (req, res, next) => {
     //  Socket emit to group
     io.to(groupId).emit("groupMessage", {
       newMessage: messageDoc,
-      groupId,
     });
 
     return res.status(201).json({
       success: true,
       newMessage: messageDoc,
-    });
-  } catch (error) {
-    console.log(error);
-
-    next(error);
-  }
-};
-
-//* GET /api/messages/group/:groupId
-export const getGroupMessages = async (req, res, next) => {
-  try {
-    const userId = req.user._id;
-    const { groupId } = req.params;
-    const group = await GroupModel.findById(groupId);
-
-    const isMember = group.members.some(
-      (member) => member.toString() === userId.toString()
-    );
-    if (!isMember) {
-      const error = new Error("You are not a member");
-      error.statusCode = 400;
-      throw error;
-    }
-    const messages = await MessageModel.find({
-      groupId: groupId,
-    });
-    // .populate("senderId", "-password");
-
-    return res.status(200).json({
-      success: true,
-      messages: messages,
     });
   } catch (error) {
     console.log(error);

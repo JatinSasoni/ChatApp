@@ -15,7 +15,6 @@ const GroupRightSideBar = () => {
       selectedGroupMessages?.filter((msg) => msg.image).map((msg) => msg.image)
     );
   }, [selectedGroupMessages, groupSelected]);
-  console.log(groupSelected);
 
   return (
     <section className="h-screen px-2 border border-gray-500 rounded w-full">

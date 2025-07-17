@@ -13,50 +13,47 @@ export const useListenMessage = () => {
   const { userSelected, selectedUserMessages, unseenMessages } = useSelector(
     (state: RootState) => state.message
   );
+  const { loggedInUser } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const SocketContext = useContext(socketContext);
 
-  //* LISTEN
   useEffect(() => {
-    if (SocketContext?.socket) {
-      SocketContext.socket.on("newMessage", async (newMessage: Message) => {
-        //*IF RECEIVER HAS OPENED SELECTED USERS CHAT THEN SHOW MESSAGE OTHERWISE UPDATE UNSEEN MESSAGES
-        if (userSelected && userSelected._id === newMessage.senderId) {
-          dispatch(
-            setSelectedUserMsgs([
-              ...(selectedUserMessages || []),
-              { ...newMessage, seen: true }, //MARKING MESSAGE AS SEEN ON FRONTEND
-            ])
-          );
+    if (!SocketContext?.socket) return;
 
-          //MARKING MESSAGE AS SEEN ON BACKEND
-          await api.put(`/api/v1/message/mark/${newMessage._id}`, "", {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          });
-        } else {
-          dispatch(
-            setUnseenMessages({
-              ...unseenMessages,
-              [newMessage.senderId]: unseenMessages[newMessage.senderId]
-                ? unseenMessages[newMessage.senderId] + 1
-                : 1,
-            })
-          );
-        }
-      });
-    }
-    return () => {
-      if (SocketContext?.socket) {
-        SocketContext.socket.off("newMessage");
+    const handleNewMessage = async (newMessage: Message) => {
+      console.log(newMessage);
+
+      if (userSelected && userSelected._id === newMessage.senderId) {
+        dispatch(
+          setSelectedUserMsgs([
+            ...(selectedUserMessages || []),
+            { ...newMessage, seenBy: loggedInUser ? [loggedInUser._id] : [] },
+          ])
+        );
+
+        await api.put(`/api/v1/message/mark/${newMessage._id}`, "");
+      } else {
+        dispatch(
+          setUnseenMessages({
+            ...unseenMessages,
+            [newMessage.senderId]: unseenMessages[newMessage.senderId]
+              ? unseenMessages[newMessage.senderId] + 1
+              : 1,
+          })
+        );
       }
+    };
+
+    SocketContext.socket.on("newMessage", handleNewMessage);
+
+    return () => {
+      SocketContext.socket?.off("newMessage", handleNewMessage);
     };
   }, [
     SocketContext?.socket,
     userSelected,
+    loggedInUser,
     dispatch,
-    SocketContext,
     selectedUserMessages,
     unseenMessages,
   ]);

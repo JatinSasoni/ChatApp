@@ -1,62 +1,62 @@
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../Store/store";
+import type { AppDispatch, RootState } from "../../Store/store";
 import { useContext, useEffect } from "react";
 import { socketContext } from "../../ContextForSocket/context";
 import type { Message } from "../../types/models";
-import { setSelectedGroupMessages } from "../../Store/Slices/Group-slice";
+import {
+  setSelectedGroupMessages,
+  setUnseenMessages,
+} from "../../Store/Slices/Group-slice";
+import { api } from "../../Api/axios";
 
 export const useListenGroupMessage = () => {
-  const { groupSelected, selectedGroupMessages } = useSelector(
+  const { groupSelected, selectedGroupMessages, unseenMessages } = useSelector(
     (state: RootState) => state.group
   );
-  const dispatch = useDispatch();
+  const { loggedInUser } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
   const SocketContext = useContext(socketContext);
 
-  //* LISTEN
   useEffect(() => {
-    if (SocketContext?.socket) {
-      SocketContext.socket.on(
-        "groupMessage",
-        async ({ newMessage }: { newMessage: Message }) => {
-          //*IF RECEIVER HAS OPENED SELECTED GROUP CHAT THEN SHOW MESSAGE OTHERWISE UPDATE UNSEEN MESSAGES
-          if (groupSelected && groupSelected._id === newMessage.groupId) {
-            dispatch(
-              setSelectedGroupMessages([
-                ...(selectedGroupMessages || []),
-                { ...newMessage, seen: true }, //MARKING MESSAGE AS SEEN ON FRONTEND
-              ])
-            );
+    if (!SocketContext?.socket) return;
 
-            // MARKING MESSAGE AS SEEN ON BACKEND
-            // await api.put(`/api/v1/message/mark/${newMessage._id}`, "", {
-            //   headers: {
-            //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-            //   },
-            // });
-          } else {
-            // dispatch(
-            //   setUnseenMessages({
-            //     ...unseenMessages,
-            //     [newMessage.senderId]: unseenMessages[newMessage.senderId]
-            //       ? unseenMessages[newMessage.senderId] + 1
-            //       : 1,
-            //   })
-            // );
-          }
-        }
-      );
-    }
-    return () => {
-      if (SocketContext?.socket) {
-        SocketContext.socket.off("newMessage");
+    const handleGroupMessage = async ({
+      newMessage,
+    }: {
+      newMessage: Message;
+    }) => {
+      if (groupSelected && groupSelected._id === newMessage.groupId) {
+        dispatch(
+          setSelectedGroupMessages([
+            ...(selectedGroupMessages || []),
+            { ...newMessage, seenBy: loggedInUser ? [loggedInUser._id] : [] }, // mark as seen
+          ])
+        );
+        // Mark message as seen on backend
+        await api.put(`/api/v1/groups/mark/${newMessage._id}`, "");
+      } else {
+        dispatch(
+          setUnseenMessages({
+            ...unseenMessages,
+            [newMessage.groupId]: unseenMessages[newMessage.groupId]
+              ? unseenMessages[newMessage.groupId] + 1
+              : 1,
+          })
+        );
       }
+    };
+
+    SocketContext.socket?.on("groupMessage", handleGroupMessage);
+
+    return () => {
+      SocketContext.socket?.off("groupMessage", handleGroupMessage);
     };
   }, [
     SocketContext?.socket,
     groupSelected,
     dispatch,
-    SocketContext,
     selectedGroupMessages,
-    // unseenMessages,
+    unseenMessages,
+    loggedInUser,
   ]);
 };

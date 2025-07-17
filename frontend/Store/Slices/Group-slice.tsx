@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Message } from "../../types/models";
+import type { Message, UnseenMessages } from "../../types/models";
 
 export interface Group {
   _id: string;
@@ -20,9 +20,6 @@ export interface Group {
     }
   ];
   messages: string[];
-}
-interface UnseenMessages {
-  [groupId: string]: number;
 }
 
 interface state {

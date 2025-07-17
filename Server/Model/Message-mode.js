@@ -21,10 +21,12 @@ const messageSchema = mongoose.Schema(
     image: {
       type: String,
     },
-    seen: {
-      type: Boolean,
-      default: false,
-    },
+    seenBy: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "user",
+      },
+    ],
   },
   { timestamps: true }
 );
