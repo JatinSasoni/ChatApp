@@ -11,6 +11,7 @@ import { TfiGallery } from "react-icons/tfi";
 import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
 import useJoinAllGroups from "../Hooks/useJoinLeaveGroup";
 import CreateGroup from "./CreateGroup";
+import GroupRightSideBar from "./GroupRightSideBar";
 
 const GroupContainer = () => {
   const { groupSelected, selectedGroupMessages } = useSelector(
@@ -76,7 +77,7 @@ const GroupContainer = () => {
 
   return (
     <section
-      className={`h-screen max-w-6xl flex flex-col bg-white rounded-lg shadow-md transition-all
+      className={`w-full h-screen max-w-6xl flex flex-col bg-white rounded-lg shadow-md transition-all
   ${
     groupSelected
       ? "min-[1430px]:min-w-[868px] max-[1430px]:min-w-[760px] max-[1270px]:min-w-[660px] max-[900px]:min-w-full"
@@ -91,11 +92,11 @@ const GroupContainer = () => {
               onClick={() => navigate(`/chat/mobile/profile`)}
               className="flex items-center gap-3 cursor-pointer"
             >
-              {/* <img
-                src={userSelected.Profile.profilePhoto || "/avatar_icon.png"}
+              <img
+                src={groupSelected.profile.profilePhoto || "/avatar_icon.png"}
                 alt="Friend"
                 className="size-10 rounded-full object-cover"
-              /> */}
+              />
               <div className="flex items-center gap-1 text-sm font-medium">
                 <span>{groupSelected.name}</span>
                 {/* {onlineUsers.includes(userSelected._id) && (

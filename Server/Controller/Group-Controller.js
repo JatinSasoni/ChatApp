@@ -8,7 +8,6 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 export const createGroup = async (req, res, next) => {
   try {
     const { groupName, members } = req.body;
-    console.log({ groupName, members });
 
     const userId = req.user._id;
 
@@ -165,9 +164,9 @@ export const addMembersToGroup = async (req, res, next) => {
       error.statusCode = 400;
       throw error;
     }
-    await group.members.push(...members); //ensure members are duplicated ...new Set(...members,...group.members)
+    group.members.push(...members); //ensure members are duplicated ...new Set(...members,...group.members)
     await group.save();
-    return res.status(200).json({ success: true, allGroups });
+    return res.status(200).json({ success: true, group });
   } catch (error) {
     next(error);
   }

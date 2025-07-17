@@ -18,13 +18,7 @@ const Group = () => {
       <Navbar />
       <GroupSidebar />
       <GroupContainer />
-      {/* {groupSelected ? (
-        <>
-          <GroupContainer /> <GroupRightSideBar />
-        </>
-      ) : (
-        <CreateGroup />
-      )} */}
+      <GroupRightSideBar />
     </section>
   );
 };

@@ -65,11 +65,13 @@ const GroupSidebar = () => {
                   >
                     <div className="flex p-1 gap-2">
                       <div className="min-w-10">
-                        {/* <img
-                          src={user?.Profile.profilePhoto || "/avatar_icon.png"}
+                        <img
+                          src={
+                            group?.profile.profilePhoto || "/avatar_icon.png"
+                          }
                           alt="Profile-Photo"
                           className="size-10 rounded-full object-cover"
-                        /> */}
+                        />
                       </div>
                       <div className=" flex justify-between pr-3 w-full items-center">
                         <div>

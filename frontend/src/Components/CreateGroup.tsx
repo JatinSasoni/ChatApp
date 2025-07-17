@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import axios from "axios";
@@ -9,6 +9,7 @@ const CreateGroup = () => {
   const { friends } = useSelector((state: RootState) => state.friendship);
 
   const [groupName, setGroupName] = useState("");
+  const [groupProfilePic, setGroupProfilePic] = useState<File | null>();
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [error, setError] = useState("");
 
@@ -30,11 +31,26 @@ const CreateGroup = () => {
       setError("Select at least one member");
       return;
     }
+
+    let profilePhoto: string | ArrayBuffer | null = "";
+    if (groupProfilePic) {
+      profilePhoto = await new Promise<string | null>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = () => {
+          reject("Error reading file");
+        };
+        reader.readAsDataURL(groupProfilePic);
+      });
+    }
     setError("");
 
     const newGroup = {
       groupName,
       members: selectedFriends,
+      profilePhoto,
     };
 
     // TODO: Trigger API call or redux dispatch here
@@ -57,13 +73,28 @@ const CreateGroup = () => {
   };
 
   return (
-    <section className="w-full">
+    <section className="w-full ">
       <form
         className="max-w-md mx-auto mt-20 p-6 bg-white border rounded-lg shadow-lg"
         onSubmit={handleSubmit}
       >
         <h2 className="text-2xl font-bold mb-6">Create a Group</h2>
 
+        <div className="mb-4">
+          <label className="block text-gray-700 font-bold mb-2" htmlFor="name">
+            Group Avatar:
+          </label>
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 "
+            type="file"
+            placeholder="Enter group name"
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setGroupProfilePic(e.target?.files?.[0])
+            }
+            id="ProfilePhoto"
+            accept="image/jpeg, image/png"
+          />
+        </div>
         <div className="mb-4">
           <label className="block text-gray-700 font-bold mb-2" htmlFor="name">
             Group Name:
