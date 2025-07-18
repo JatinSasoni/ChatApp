@@ -1,28 +1,26 @@
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../Store/store";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { useCheckAuth } from "../Hooks/checkAuth";
+import {
+  setAllGroups,
+  setGroupSelected,
+  setGroupUpdateBoxOpen,
+} from "../../Store/Slices/Group-slice";
+import { IoMdClose } from "react-icons/io";
 import { useState, type ChangeEvent } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import type { RootState } from "../../Store/store";
 import { api } from "../../Api/axios";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { setLoggedInUser } from "../../Store/Slices/auth-slice";
-import { IoMdClose } from "react-icons/io";
+import toast from "react-hot-toast";
 
-type Inputs = {
-  username: string;
-  bio: string;
-};
-type Props = {
-  setIsUpdate: React.Dispatch<React.SetStateAction<boolean>>;
-};
-
-const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
-  const navigate = useNavigate();
+const UpdateGroupInfo = () => {
+  type Inputs = {
+    groupName: string;
+  };
   const dispatch = useDispatch();
-  useCheckAuth();
-  const { loggedInUser } = useSelector((state: RootState) => state.auth);
-  const [profilePic, setProfilePic] = useState<File | null>();
+  const [groupProfilePic, setGroupProfilePic] = useState<File | null>();
+  const { groupSelected, groups } = useSelector(
+    (state: RootState) => state.group
+  );
   const [loading, setLoading] = useState<boolean>(false);
 
   const {
@@ -31,14 +29,13 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
-      username: loggedInUser?.username || "",
-      bio: loggedInUser?.Profile.bio || "",
+      groupName: groupSelected?.name || "",
     },
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     let profilePhoto: string | ArrayBuffer | null = "";
-    if (profilePic) {
+    if (groupProfilePic) {
       profilePhoto = await new Promise<string | null>((resolve, reject) => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -47,32 +44,42 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
         reader.onerror = () => {
           reject("Error reading file");
         };
-        reader.readAsDataURL(profilePic);
+        reader.readAsDataURL(groupProfilePic);
       });
     }
-
     // Submit to backend with the profilePic
     const payload = {
       ...data,
-      profilePhoto: profilePhoto, // This is base64 string now
+      profilePic: profilePhoto, // This is base64 string now
     };
 
     try {
       setLoading(true);
-      const response = await api.patch("/api/v1/user/update-user", payload, {
-        withCredentials: true,
-      });
+      const response = await api.put(
+        `/api/v1/groups/update/${groupSelected?._id}`,
+        payload,
+        {
+          withCredentials: true,
+        }
+      );
       if (response?.data?.success) {
-        dispatch(setLoggedInUser(response.data.user));
-        setIsUpdate((prev) => !prev);
+        toast.success("Group info changed");
+        dispatch(setGroupSelected(response.data?.group));
+        dispatch(
+          setAllGroups([
+            ...groups.map((group) =>
+              group._id === response.data?.group._id
+                ? response.data?.group
+                : group
+            ),
+          ])
+        );
+        dispatch(setGroupUpdateBoxOpen(false));
       }
-
-      navigate("/profile");
     } catch (error) {
       //*Type guard
       if (axios.isAxiosError(error)) {
         console.log(error.response?.data);
-        navigate("login");
       } else {
         console.log("An unexpected error occurred:", error);
       }
@@ -92,7 +99,7 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
               </h1>
               <IoMdClose
                 className="my-auto size-8"
-                onClick={() => setIsUpdate((prev) => !prev)}
+                onClick={() => dispatch(setGroupUpdateBoxOpen(false))}
               />
             </div>
 
@@ -109,14 +116,10 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
                 </label>
                 <input
                   type="text"
-                  {...register("username", {
+                  {...register("groupName", {
                     required: {
                       value: true,
-                      message: "Username is required",
-                    },
-                    minLength: {
-                      value: 3,
-                      message: "Should be greater than 3 char",
+                      message: "Group name is required",
                     },
                   })}
                   id="username"
@@ -124,39 +127,24 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
                   placeholder="username..."
                 />
                 <span className="text-red-500">
-                  {errors.username && errors.username.message}
+                  {errors.groupName && errors.groupName.message}
                 </span>
-              </div>
-              <div>
-                <label
-                  htmlFor="bio"
-                  className="block mb-2 text-sm font-medium text-gray-900 "
-                >
-                  Bio
-                </label>
-                <input
-                  type="text"
-                  {...register("bio")}
-                  id="bio"
-                  className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="Your bio.."
-                />
               </div>
               <div>
                 <input
                   type="file"
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                    setProfilePic(e.target?.files?.[0])
+                    setGroupProfilePic(e.target?.files?.[0])
                   }
                   id="ProfilePhoto"
                   accept="image/jpeg, image/png"
                   className="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5  dark:focus:ring-blue-500 dark:focus:border-blue-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
                 />
-                {profilePic && (
+                {groupProfilePic && (
                   <div className="">
                     <span>Preview :</span>
                     <img
-                      src={URL.createObjectURL(profilePic)}
+                      src={URL.createObjectURL(groupProfilePic)}
                       alt="Group Preview"
                       className="mt-2 size-20 rounded-full object-cover border mx-auto"
                     />
@@ -179,4 +167,4 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
   );
 };
 
-export default UpdateProfile;
+export default UpdateGroupInfo;

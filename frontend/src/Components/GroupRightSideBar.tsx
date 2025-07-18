@@ -5,19 +5,24 @@ import GroupMembersCard from "./GroupMembersCard"; // assuming this exists
 import GroupAddMemberCard from "./GroupAddMemberCard";
 import { api } from "../../Api/axios";
 import toast from "react-hot-toast";
-import { setGroupSelected } from "../../Store/Slices/Group-slice";
-// import GroupAddMemberCard from "./GroupAddMemberCard"; // create this component as needed
+import {
+  setAllGroups,
+  setGroupSelected,
+  setGroupUpdateBoxOpen,
+} from "../../Store/Slices/Group-slice";
+import axios from "axios";
 
 const GroupRightSideBar = () => {
   const dispatch = useDispatch();
-  const { groupSelected, selectedGroupMessages } = useSelector(
+  const { groupSelected, selectedGroupMessages, groups } = useSelector(
     (state: RootState) => state.group
   );
   const { friends } = useSelector((state: RootState) => state.friendship);
+  const { loggedInUser } = useSelector((state: RootState) => state.auth);
   const [msgImages, setMsgImages] = useState<string[]>([]);
   const [selectedTab, setSelectedTab] = useState<
     "media" | "members" | "addMembers"
-  >("media");
+  >("members");
 
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
 
@@ -40,21 +45,35 @@ const GroupRightSideBar = () => {
 
   //ADD TO GROUP HANDLER
   const addToGroupHandler = async () => {
-    console.log("ok");
-    const response = await api.post(
-      `/api/v1/groups/${groupSelected?._id}/add-members`,
-      {
-        members: selectedFriends,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-    console.log(response);
+    try {
+      const response = await api.post(
+        `/api/v1/groups/${groupSelected?._id}/add-members`,
+        {
+          members: selectedFriends,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
-    if (response.data.success) {
-      toast.success("Added to group");
-      setSelectedFriends([]);
+      if (response.data.success) {
+        toast.success("Added to group");
+        dispatch(setGroupSelected(response.data?.group));
+        dispatch(
+          setAllGroups([
+            ...groups.map((group) =>
+              group._id === response.data?.group._id
+                ? response.data?.group
+                : group
+            ),
+          ])
+        );
+        setSelectedFriends([]);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error?.response?.data.message);
+      }
     }
   };
 
@@ -64,11 +83,16 @@ const GroupRightSideBar = () => {
         !groupSelected && "hidden"
       } h-screen px-2 border border-gray-500 rounded w-full`}
     >
+      {/* Main container */}
       <div className="h-full">
         <div className="flex justify-between px-2">
           <p className="text-xl">Profile</p>
+          {/* HERE COMES ICON FOR UPDATE GROUP INFO */}
+          <button onClick={() => dispatch(setGroupUpdateBoxOpen(true))}>
+            Edit
+          </button>
         </div>
-
+        {/* Profile,Admin */}
         <div className="my-2">
           <img
             src={groupSelected?.profile?.profilePhoto || "/avatar_icon.png"}
@@ -86,13 +110,12 @@ const GroupRightSideBar = () => {
             {`Admin - ${groupSelected?.admin.username}`}
           </p>
         </div>
-
         {/* Tabs */}
         <div className="flex gap-2 my-1">
           <button
             className={`font-medium ${
               selectedTab === "media" && "bg-slate-100 border border-zinc-200"
-            } border rounded px-1`}
+            } border border-zinc-100 rounded px-1`}
             onClick={() => setSelectedTab("media")}
           >
             Media
@@ -100,7 +123,7 @@ const GroupRightSideBar = () => {
           <button
             className={`font-medium ${
               selectedTab === "members" && "bg-slate-100 border border-zinc-200"
-            } border rounded px-1`}
+            } border border-zinc-100 rounded px-1`}
             onClick={() => setSelectedTab("members")}
           >
             Members
@@ -109,13 +132,13 @@ const GroupRightSideBar = () => {
             className={`font-medium ${
               selectedTab === "addMembers" &&
               "bg-slate-100 border border-zinc-200"
-            } border rounded px-1`}
+            } border border-zinc-100 rounded px-1`}
             onClick={() => setSelectedTab("addMembers")}
           >
-            Add Members
+            Add Friends
           </button>
         </div>
-
+        {/* Selected Tab content */}
         <div className="p-2 rounded-md h-90 overflow-scroll shadow bg-slate-50 border border-slate-400">
           {selectedTab === "media" && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 gap-2 gap-y-4 p-2">
@@ -138,7 +161,12 @@ const GroupRightSideBar = () => {
           {selectedTab === "members" && (
             <ul>
               {groupSelected?.members.map((member) => (
-                <GroupMembersCard member={member} key={member._id} />
+                <GroupMembersCard
+                  member={member}
+                  key={member._id}
+                  isAdmin={groupSelected.admin._id === loggedInUser?._id}
+                  groupId={groupSelected._id}
+                />
               ))}
             </ul>
           )}
@@ -160,6 +188,7 @@ const GroupRightSideBar = () => {
             </ul>
           )}
         </div>
+        {/* Add to group button */}
         {selectedTab === "addMembers" && (
           <button
             onClick={addToGroupHandler}

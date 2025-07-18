@@ -7,7 +7,7 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 //*POST REQ TO CREATE GROUP
 export const createGroup = async (req, res, next) => {
   try {
-    const { groupName, members } = req.body;
+    const { groupName, members, profilePhoto } = req.body;
 
     const userId = req.user._id;
 
@@ -30,15 +30,32 @@ export const createGroup = async (req, res, next) => {
       error.statusCode = 400;
       throw error;
     }
-    const group = await GroupModel.create({
+
+    const newGroup = await GroupModel.create({
       name: groupName,
       admin: userId,
-      members: [...new Set([...members, userId.toString()])],
+      members: [...new Set([...members, userId.toString()])], // prevent multiple
     });
+
+    if (profilePhoto) {
+      const imageURL = await uploadToCloudinary(
+        profilePhoto,
+        "/chat-test/group/profilePhoto"
+      );
+      newGroup.profile.profilePhoto = imageURL;
+    }
+
+    await newGroup
+      .save()
+      .then((group) => group.populate({ path: "admin", select: "username" }))
+      .then((group) =>
+        group.populate({ path: "members", select: "username Profile" })
+      );
+
     return res.status(201).json({
       success: true,
       message: "Group created",
-      group,
+      newGroup,
     });
   } catch (error) {
     next(error);
@@ -74,7 +91,7 @@ export const getAllGroupsAndUnseenMsgs = async (req, res, next) => {
   }
 };
 
-//* GET /api/messages/group/:groupId
+//* GET /messages/group/:groupId
 export const getGroupMessages = async (req, res, next) => {
   try {
     const userId = req.user._id;
@@ -89,8 +106,7 @@ export const getGroupMessages = async (req, res, next) => {
     }
     const messages = await MessageModel.find({
       groupId: groupId,
-    });
-    // .populate("senderId", "-password");
+    }).populate("senderId", "Profile");
 
     // Mark messages from selected group as seen by user
     await MessageModel.updateMany(
@@ -103,11 +119,10 @@ export const getGroupMessages = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      messages: messages,
+      messages,
     });
   } catch (error) {
     console.log(error);
-
     next(error);
   }
 };
@@ -165,7 +180,12 @@ export const addMembersToGroup = async (req, res, next) => {
       throw error;
     }
     group.members.push(...members); //ensure members are duplicated ...new Set(...members,...group.members)
-    await group.save();
+    await group
+      .save()
+      .then((group) => group.populate({ path: "admin", select: "username" }))
+      .then((group) =>
+        group.populate({ path: "members", select: "username Profile" })
+      );
     return res.status(200).json({ success: true, group });
   } catch (error) {
     next(error);
@@ -199,7 +219,9 @@ export const sendMessageToGroup = async (req, res, next) => {
       groupId,
       text: message,
       image: imageURL,
-    });
+    }).then((message) =>
+      message.populate({ path: "senderId", select: "Profile" })
+    );
     //socket------
     //  Socket emit to group
     io.to(groupId).emit("groupMessage", {
@@ -213,6 +235,89 @@ export const sendMessageToGroup = async (req, res, next) => {
   } catch (error) {
     console.log(error);
 
+    next(error);
+  }
+};
+
+//* PUT REQUEST TO UPDATE GROUP INFO
+export const updateGroupInfo = async (req, res, next) => {
+  try {
+    const adminId = req.user._id;
+    const { groupId } = req.params;
+    const { groupName, profilePic } = req.body; // Optional fields
+
+    const group = await GroupModel.findById(groupId);
+    if (!group) {
+      const error = new Error("Group not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (group.admin.toString() !== adminId.toString()) {
+      const error = new Error("Only admin can update the group");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    if (groupName) group.name = groupName;
+    if (profilePic) group.profile.profilePhoto = profilePic;
+
+    await group
+      .save()
+      .then((group) => group.populate({ path: "admin", select: "username" }))
+      .then((group) =>
+        group.populate({ path: "members", select: "username Profile" })
+      );
+
+    return res.status(200).json({ success: true, group });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//* PUT REQUEST TO REMOVE MEMBERS
+export const removeGroupMember = async (req, res, next) => {
+  try {
+    const adminId = req.user._id;
+    const { groupId, memberId } = req.params;
+
+    const group = await GroupModel.findById(groupId);
+    if (!group) {
+      const error = new Error("Group not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (group.admin.toString() !== adminId.toString()) {
+      const error = new Error("Only admin can update the group");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    if (adminId.toString() === memberId) {
+      const error = new Error("Admin cannot remove themselves");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    // Remove the member
+    group.members = group.members.filter(
+      (member) => member.toString() !== memberId
+    );
+
+    await group
+      .save()
+      .then((group) => group.populate({ path: "admin", select: "username" }))
+      .then((group) =>
+        group.populate({ path: "members", select: "username Profile" })
+      );
+
+    return res.status(200).json({
+      success: true,
+      message: "Member removed successfully",
+      group,
+    });
+  } catch (error) {
     next(error);
   }
 };

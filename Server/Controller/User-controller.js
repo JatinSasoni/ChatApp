@@ -41,7 +41,7 @@ export const getSelectedUser = async (req, res, next) => {
         { senderId: userId, receiverId: selectedUserId },
         { senderId: selectedUserId, receiverId: userId },
       ],
-    });
+    }).populate("senderId", "Profile");
     // Mark messages from selected user as seen
     await MessageModel.updateMany(
       {
@@ -130,7 +130,9 @@ export const sendMessage = async (req, res, next) => {
       receiverId,
       text: text || "",
       image: imageURL,
-    });
+    }).then((message) =>
+      message.populate({ path: "senderId", select: "Profile" })
+    );
 
     //*EMIT NEW MESSAGE TO RECEIVER'S SOCKET
     //STEP-1 GET RECEIVER'S SOCKET ID

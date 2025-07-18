@@ -11,7 +11,6 @@ import { TfiGallery } from "react-icons/tfi";
 import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
 import useJoinAllGroups from "../Hooks/useJoinLeaveGroup";
 import CreateGroup from "./CreateGroup";
-import GroupRightSideBar from "./GroupRightSideBar";
 
 const GroupContainer = () => {
   const { groupSelected, selectedGroupMessages } = useSelector(
@@ -99,9 +98,6 @@ const GroupContainer = () => {
               />
               <div className="flex items-center gap-1 text-sm font-medium">
                 <span>{groupSelected.name}</span>
-                {/* {onlineUsers.includes(userSelected._id) && (
-                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                )} */}
               </div>
             </div>
             <IoArrowBackSharp

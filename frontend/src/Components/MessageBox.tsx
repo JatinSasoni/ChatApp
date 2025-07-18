@@ -10,51 +10,67 @@ type Props = {
 
 const MessageBox: React.FC<Props> = ({ message }) => {
   const { loggedInUser } = useSelector((state: RootState) => state.auth);
+  const isCurrentUser = message.senderId._id === loggedInUser?._id;
+
   return (
     <div
-      className={`my-1 flex ${
-        message.senderId === loggedInUser?._id ? "flex-row-reverse" : ""
-      }`}
+      className={`my-2 flex gap-2 ${isCurrentUser ? "flex-row-reverse" : ""}`}
     >
-      {message.image && (
-        <div>
-          <img
-            src={message.image}
-            className="size-42 hover:translate-x-0.5 duration-300 rounded-xl"
-            onClick={() => window.open(message.image)}
-          />
-          <p
-            className={`text-xs mt-1 ${
-              message.senderId === loggedInUser?._id && "text-end"
-            } `}
-          >
-            {convertToLocaleFormat(message.createdAt)}
-          </p>
-        </div>
-      )}
+      {/* Profile picture with better spacing */}
+      <div className="flex-shrink-0 self-end mb-1">
+        <img
+          src={message.senderId.Profile.profilePhoto}
+          alt={`friends-pfp`}
+          className="size-9 rounded-full object-cover border border-gray-200"
+        />
+      </div>
 
-      {message.text && (
-        <div>
-          <p
-            className={`break-all max-w-60 p-2 rounded-xl text-md ${
-              message.senderId === loggedInUser?._id
-                ? "bg-purple-600 text-white rounded-br-none"
-                : "text-black bg-zinc-300 rounded-bl-none"
-            }`}
+      {/* Message content container */}
+      <div
+        className={`flex flex-col ${
+          isCurrentUser ? "items-end" : "items-start"
+        }`}
+      >
+        {message.image ? (
+          <div className="max-w-[280px]">
+            <img
+              src={message.image}
+              alt="Shared content"
+              className="rounded-xl border border-gray-200 transition-all duration-200 
+                   group-hover:shadow-md group-hover:scale-[1.01] cursor-pointer"
+              onClick={() => window.open(message.image)}
+            />
+          </div>
+        ) : (
+          <div
+            className={`break-words max-w-[240px] p-3 rounded-2xl text-sm leading-snug ${
+              isCurrentUser
+                ? "bg-purple-600 text-white rounded-br-sm"
+                : "bg-gray-100 text-gray-800 rounded-bl-sm"
+            } shadow-sm`}
           >
             {message.text}
-          </p>
-          <p
-            className={`text-[10px] ${
-              message.senderId === loggedInUser?._id && "text-end"
-            } `}
-          >
-            {convertToLocaleFormat(message.createdAt)}
-          </p>
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* Timestamp with subtle styling */}
+        <MessageTimestamp time={message.createdAt} alignRight={isCurrentUser} />
+      </div>
     </div>
   );
 };
 
+function MessageTimestamp({
+  time,
+  alignRight,
+}: {
+  time: string;
+  alignRight: boolean;
+}) {
+  return (
+    <p className={`text-[10px] mt-1 ${alignRight && "text-end"}`}>
+      {convertToLocaleFormat(time)}
+    </p>
+  );
+}
 export default MessageBox;

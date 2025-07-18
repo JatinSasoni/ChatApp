@@ -23,7 +23,7 @@ export const useListenMessage = () => {
     const handleNewMessage = async (newMessage: Message) => {
       console.log(newMessage);
 
-      if (userSelected && userSelected._id === newMessage.senderId) {
+      if (userSelected && userSelected._id === newMessage.senderId._id) {
         dispatch(
           setSelectedUserMsgs([
             ...(selectedUserMessages || []),
@@ -36,8 +36,8 @@ export const useListenMessage = () => {
         dispatch(
           setUnseenMessages({
             ...unseenMessages,
-            [newMessage.senderId]: unseenMessages[newMessage.senderId]
-              ? unseenMessages[newMessage.senderId] + 1
+            [newMessage.senderId._id]: unseenMessages[newMessage.senderId._id]
+              ? unseenMessages[newMessage.senderId._id] + 1
               : 1,
           })
         );

@@ -42,7 +42,10 @@ const Profile = () => {
                 <img
                   src={loggedInUser?.Profile.profilePhoto}
                   alt="Profile"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={() =>
+                    window.open(loggedInUser?.Profile.profilePhoto)
+                  }
                 />
               </div>
               <h1 className="text-3xl font-bold mt-3 text-center">

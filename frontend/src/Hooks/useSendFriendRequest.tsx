@@ -4,11 +4,12 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 const useSendFriendRequest = () => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [sendingFriendRequest, setSendingFriendRequest] =
+    useState<boolean>(false);
 
   const sendRequestHandler = async (receiverId: string | undefined) => {
     try {
-      setLoading(true);
+      setSendingFriendRequest(true);
       const response = await api.post(
         `/api/v1/friendship/send/${receiverId}/request`,
         "",
@@ -26,10 +27,10 @@ const useSendFriendRequest = () => {
         toast.error("An unexpected error occurred");
       }
     } finally {
-      setLoading(false);
+      setSendingFriendRequest(false);
     }
   };
-  return { loading, sendRequestHandler };
+  return { sendingFriendRequest, sendRequestHandler };
 };
 
 export default useSendFriendRequest;

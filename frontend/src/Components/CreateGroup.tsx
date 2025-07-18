@@ -1,17 +1,22 @@
-import { useState, type ChangeEvent } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { api } from "../../Api/axios";
+import { setAllGroups } from "../../Store/Slices/Group-slice";
 
 const CreateGroup = () => {
+  const dispatch = useDispatch();
   const { friends } = useSelector((state: RootState) => state.friendship);
-
+  const { groups } = useSelector((state: RootState) => state.group);
   const [groupName, setGroupName] = useState("");
   const [groupProfilePic, setGroupProfilePic] = useState<File | null>();
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const groupProfileRef = useRef<HTMLInputElement | null>(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleFriendToggle = (friendId: string) => {
     setSelectedFriends((prev) =>
@@ -32,7 +37,7 @@ const CreateGroup = () => {
       return;
     }
 
-    let profilePhoto: string | ArrayBuffer | null = "";
+    let profilePhoto: string | ArrayBuffer | null = "/avatar_icon.png";
     if (groupProfilePic) {
       profilePhoto = await new Promise<string | null>((resolve, reject) => {
         const reader = new FileReader();
@@ -53,15 +58,22 @@ const CreateGroup = () => {
       profilePhoto,
     };
 
-    // TODO: Trigger API call or redux dispatch here
     try {
+      setLoading(true);
       const response = await api.post("/api/v1/groups/create", newGroup, {
         withCredentials: true,
       });
+
       if (response.data.success) {
+        dispatch(setAllGroups([...groups, response.data?.newGroup]));
         toast.success(response.data.message);
         setGroupName("");
+        setGroupProfilePic(null);
+        setPreviewUrl(null);
         setSelectedFriends([]);
+        if (groupProfileRef.current) {
+          groupProfileRef.current.value = "";
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -69,74 +81,108 @@ const CreateGroup = () => {
       } else {
         toast.error("Something went wrong");
       }
+    } finally {
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (!groupProfilePic) {
+      setPreviewUrl(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(groupProfilePic);
+    setPreviewUrl(objectUrl);
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [groupProfilePic]);
+
   return (
-    <section className="w-full ">
+    <section className="w-full flex justify-center items-center min-h-screen bg-gray-50">
       <form
-        className="max-w-md mx-auto mt-20 p-6 bg-white border rounded-lg shadow-lg"
+        className="w-full max-w-md mx-auto p-6 bg-white border-1 border-slate-400 rounded-xl shadow-lg space-y-6"
         onSubmit={handleSubmit}
       >
-        <h2 className="text-2xl font-bold mb-6">Create a Group</h2>
+        <h2 className="text-3xl font-bold text-center text-blue-600">
+          Create a Group
+        </h2>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2" htmlFor="name">
+        <div>
+          <label
+            className="block text-gray-700 font-semibold mb-2"
+            htmlFor="profilePhoto"
+          >
             Group Avatar:
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 "
+            id="profilePhoto"
             type="file"
-            placeholder="Enter group name"
+            ref={groupProfileRef}
+            accept="image/jpeg, image/png"
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setGroupProfilePic(e.target?.files?.[0])
             }
-            id="ProfilePhoto"
-            accept="image/jpeg, image/png"
+            className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
           />
+          {groupProfilePic && previewUrl && (
+            <img
+              src={previewUrl}
+              alt="Group Preview"
+              className="mt-2 size-20 rounded-full object-cover border"
+            />
+          )}
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold mb-2" htmlFor="name">
+
+        <div>
+          <label
+            htmlFor="name"
+            className="block text-gray-700 font-semibold mb-2"
+          >
             Group Name:
           </label>
           <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             id="name"
             type="text"
             placeholder="Enter group name"
             value={groupName}
             onChange={(e) => setGroupName(e.target.value)}
+            className="w-full border rounded-md p-2 focus:ring focus:ring-blue-200 focus:outline-none"
           />
         </div>
 
-        <div className="mb-4">
-          <p className="text-gray-700 font-bold mb-2">Select Members:</p>
-          <div className="max-h-48 overflow-y-auto border rounded p-2">
+        <div>
+          <p className="text-gray-700 font-semibold mb-2">Select Members:</p>
+          <div className="max-h-48 overflow-y-auto border rounded-md p-3 bg-gray-50 space-y-2">
             {friends.length === 0 ? (
               <p className="text-gray-500">No friends available</p>
             ) : (
               friends.map((friend) => (
-                <label key={friend._id} className="flex items-center mb-2">
+                <label
+                  key={friend._id}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded"
+                >
                   <input
                     type="checkbox"
                     checked={selectedFriends.includes(friend._id)}
                     onChange={() => handleFriendToggle(friend._id)}
-                    className="mr-2"
+                    className="accent-blue-500"
                   />
-                  <span>{friend.username}</span>
+                  <span className="text-gray-700">{friend.username}</span>
                 </label>
               ))
             )}
           </div>
         </div>
 
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {error && <p className="text-red-500">{error}</p>}
 
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
+          disabled={loading}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow focus:outline-none focus:ring focus:ring-blue-300"
         >
-          Create Group
+          {loading ? "Creating.." : "Create Group"}
         </button>
       </form>
     </section>

@@ -27,6 +27,7 @@ interface state {
   groupSelected: Group | null;
   selectedGroupMessages: Message[];
   unseenMessages: UnseenMessages;
+  isGroupUpdateBoxOpen: boolean;
 }
 
 const initialState: state = {
@@ -34,6 +35,7 @@ const initialState: state = {
   groupSelected: null,
   selectedGroupMessages: [],
   unseenMessages: {},
+  isGroupUpdateBoxOpen: false,
 };
 
 const groupSlice = createSlice({
@@ -52,6 +54,9 @@ const groupSlice = createSlice({
     setUnseenMessages: (state, action: PayloadAction<UnseenMessages>) => {
       state.unseenMessages = action.payload;
     },
+    setGroupUpdateBoxOpen: (state, action: PayloadAction<boolean>) => {
+      state.isGroupUpdateBoxOpen = action.payload;
+    },
   },
 });
 
@@ -60,6 +65,7 @@ export const {
   setGroupSelected,
   setSelectedGroupMessages,
   setUnseenMessages,
+  setGroupUpdateBoxOpen,
 } = groupSlice.actions;
 
 export default groupSlice.reducer;

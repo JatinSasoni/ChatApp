@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
     <div
       className={`mx-2 ${
         userSelected && "max-[880px]:hidden"
-      } p-2 min-w-52 min-[1400px]:min-w-70 overflow-y-scroll max-sm:h-[calc(100vh-56px)] sm:h-screen drop-shadow-md shadow-md duration-300`}
+      } p-2 min-w-52 min-[1400px]:min-w-70 overflow-y-scroll max-sm:h-[calc(100vh-56px)] sm:h-screen shadow-md duration-300`}
     >
       {/* Header */}
       <h2 className="text-2xl">Messages</h2>

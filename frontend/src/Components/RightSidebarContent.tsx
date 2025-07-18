@@ -17,7 +17,7 @@ const RightSidebarContent: React.FC<Props> = ({ userSelected, msgImages }) => {
   );
   const { friends } = useSelector((state: RootState) => state.friendship);
 
-  const { loading, sendRequestHandler } = useSendFriendRequest();
+  const { sendingFriendRequest, sendRequestHandler } = useSendFriendRequest();
 
   useEffect(() => {
     const isFriend = friends?.some(
@@ -33,7 +33,7 @@ const RightSidebarContent: React.FC<Props> = ({ userSelected, msgImages }) => {
         <p className="text-xl">Profile</p>
         {alreadyFriend ? (
           ""
-        ) : loading ? (
+        ) : sendingFriendRequest ? (
           <div className="border-t-2 border-b-2 rounded-full p-3 animate-spin"></div>
         ) : (
           <button

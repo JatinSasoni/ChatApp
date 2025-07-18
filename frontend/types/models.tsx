@@ -11,7 +11,13 @@ export interface user {
 }
 
 export interface Message {
-  senderId: string;
+  senderId: {
+    _id: string;
+    Profile: {
+      bio: string;
+      profilePhoto: string;
+    };
+  };
   receiverId: string;
   groupId: string;
   text: string;

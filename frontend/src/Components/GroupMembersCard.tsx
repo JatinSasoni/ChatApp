@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { IoPersonAddSharp } from "react-icons/io5";
+import { IoPersonAddSharp, IoPersonRemoveOutline } from "react-icons/io5";
 import useSendFriendRequest from "../Hooks/useSendFriendRequest";
+import useRemoveFromGroup from "../Hooks/useRemoveFromGroup";
 
 type Props = {
   member: {
@@ -13,9 +14,11 @@ type Props = {
       bio: string;
     };
   };
+  isAdmin: boolean;
+  groupId: string;
 };
 
-const GroupMembersCard: React.FC<Props> = ({ member }) => {
+const GroupMembersCard: React.FC<Props> = ({ member, isAdmin, groupId }) => {
   const { onlineUsers, loggedInUser } = useSelector(
     (state: RootState) => state.auth
   );
@@ -24,13 +27,15 @@ const GroupMembersCard: React.FC<Props> = ({ member }) => {
   );
   const { friends } = useSelector((state: RootState) => state.friendship);
 
-  const { loading, sendRequestHandler } = useSendFriendRequest();
+  const { sendingFriendRequest, sendRequestHandler } = useSendFriendRequest();
+  const { removeFromGroupHandler, removingFromGroup } = useRemoveFromGroup();
 
   useEffect(() => {
+    if (isAdmin) return;
     const isFriend = friends?.some((friend) => friend._id === member?._id);
 
     setAlreadyFriend(isFriend);
-  }, [member, friends]);
+  }, [member, friends, isAdmin]);
 
   return (
     <li className="cursor-pointer group">
@@ -57,9 +62,20 @@ const GroupMembersCard: React.FC<Props> = ({ member }) => {
             </p>
           </div>
           <div>
-            {alreadyFriend || member._id === loggedInUser?._id ? (
+            {isAdmin && member._id !== loggedInUser?._id ? (
+              removingFromGroup ? (
+                <div className="border-t-2 border-b-2 rounded-full p-3 animate-spin"></div>
+              ) : (
+                <button
+                  onClick={() => removeFromGroupHandler(groupId, member?._id)}
+                  aria-label="Send Friend Request"
+                >
+                  <IoPersonRemoveOutline className="my-auto hover:scale-110 duration-200 size-5" />
+                </button>
+              )
+            ) : alreadyFriend || member._id === loggedInUser?._id ? (
               ""
-            ) : loading ? (
+            ) : sendingFriendRequest ? (
               <div className="border-t-2 border-b-2 rounded-full p-3 animate-spin"></div>
             ) : (
               <button
