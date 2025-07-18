@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addMembersToGroup,
   createGroup,
+  deleteGroup,
   getAllGroupsAndUnseenMsgs,
   getGroupMessages,
   markMessagesSeenGroup,
@@ -28,5 +29,6 @@ groupRouter.post(
   isAuthenticated,
   sendMessageToGroup
 );
+groupRouter.delete("/:groupId/delete", isAuthenticated, deleteGroup);
 
 export default groupRouter;

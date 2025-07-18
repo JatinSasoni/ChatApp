@@ -200,7 +200,11 @@ export const sendMessageToGroup = async (req, res, next) => {
     const { groupId } = req.params;
 
     const group = await GroupModel.findById(groupId);
-    if (!group) throw new Error("Group not found");
+    if (!group) {
+      const error = new Error("Group not found");
+      error.statusCode = 400;
+      throw error;
+    }
 
     const isMember = group.members.includes(userId.toString());
 
@@ -316,6 +320,35 @@ export const removeGroupMember = async (req, res, next) => {
       success: true,
       message: "Member removed successfully",
       group,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+//* DELETE REQUEST TO DELETE GROUP
+export const deleteGroup = async (req, res, next) => {
+  try {
+    const adminId = req.user._id;
+    const { groupId } = req.params;
+    //find group via admin and group id
+    const group = await GroupModel.findOne({
+      _id: groupId,
+      admin: adminId,
+    });
+    if (!group) {
+      const error = new Error("Group not found or unauthorized");
+      error.statusCode = 400;
+      throw error;
+    }
+    //delete group
+    await GroupModel.findByIdAndDelete(groupId);
+    //delete messages
+    await MessageModel.deleteMany({ groupId });
+    return res.status(200).json({
+      success: true,
+      message: "Group removed successfully",
+      groupId,
     });
   } catch (error) {
     next(error);

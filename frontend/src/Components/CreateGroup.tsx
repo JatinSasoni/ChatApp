@@ -99,7 +99,7 @@ const CreateGroup = () => {
   }, [groupProfilePic]);
 
   return (
-    <section className="w-full flex justify-center items-center min-h-screen bg-gray-50">
+    <section className="w-full flex justify-center items-center min-h-screen bg-gray-200">
       <form
         className="w-full max-w-md mx-auto p-6 bg-white border-1 border-slate-400 rounded-xl shadow-lg space-y-6"
         onSubmit={handleSubmit}

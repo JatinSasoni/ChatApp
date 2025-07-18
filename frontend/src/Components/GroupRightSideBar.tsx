@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import type { RootState } from "../../Store/store";
 import GroupMembersCard from "./GroupMembersCard"; // assuming this exists
 import GroupAddMemberCard from "./GroupAddMemberCard";
+import { FaUserEdit } from "react-icons/fa";
 import { api } from "../../Api/axios";
 import toast from "react-hot-toast";
 import {
@@ -84,12 +85,12 @@ const GroupRightSideBar = () => {
       } h-screen px-2 border border-gray-500 rounded w-full`}
     >
       {/* Main container */}
-      <div className="h-full">
-        <div className="flex justify-between px-2">
+      <div className="h-screen">
+        <div className="flex justify-between">
           <p className="text-xl">Profile</p>
           {/* HERE COMES ICON FOR UPDATE GROUP INFO */}
           <button onClick={() => dispatch(setGroupUpdateBoxOpen(true))}>
-            Edit
+            <FaUserEdit className="my-auto text-black size-6" />
           </button>
         </div>
         {/* Profile,Admin */}

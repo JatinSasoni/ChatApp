@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { setLoggedInUser } from "../../Store/Slices/auth-slice";
 import { useCallback, useState } from "react";
 import { setSelectedGroupMessages } from "../../Store/Slices/Group-slice";
+import toast from "react-hot-toast";
 
 export const useFetchAndSend = () => {
   const dispatch = useDispatch();
@@ -78,6 +79,7 @@ export const useFetchAndSend = () => {
         //*Type guard
         if (axios.isAxiosError(error)) {
           console.log(error.response?.data);
+          toast.error(error.response?.data.message);
         } else {
           console.log("An unexpected error occurred:", error);
         }
