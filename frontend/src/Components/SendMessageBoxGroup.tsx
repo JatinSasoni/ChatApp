@@ -1,31 +1,28 @@
-import React, { useCallback, useState, type ChangeEvent } from "react";
+import React, { useState, type ChangeEvent } from "react";
+import { TfiGallery } from "react-icons/tfi";
+import { useFetchAndSend } from "../Hooks/useFetchAndSendMessage";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { useFetchAndSend } from "../Hooks/useFetchAndSendMessage";
-import { TfiGallery } from "react-icons/tfi";
 
 type Props = {
   setUploading: React.Dispatch<React.SetStateAction<boolean>>;
   uploading: boolean;
 };
-
-const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
+const SendMessageBoxGroup: React.FC<Props> = ({ setUploading, uploading }) => {
   const [input, setInput] = useState<string>("");
-  const { userSelected } = useSelector((state: RootState) => state.message);
-
-  const { sendMessage } = useFetchAndSend(); //CUSTOM HOOK
+  const { groupSelected } = useSelector((state: RootState) => state.group);
+  const { sendMessageGroup } = useFetchAndSend();
 
   //* SEND MESSAGE HANDLER
-  const sendMessageHandler = useCallback(() => {
+  const sendMessageHandler = () => {
     if (input.trim() === "") return;
-    sendMessage(input.trim(), userSelected?._id);
+    sendMessageGroup(input.trim(), groupSelected?._id);
     setInput("");
-  }, [input, sendMessage, userSelected]);
-
+  };
   //* SEND IMAGE
   const sendImageHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target?.files?.[0];
-    if (!file || !userSelected?._id) return;
+    if (!file || !groupSelected?._id) return;
     if (file.size > 5 * 1024 * 1024) {
       alert("Image too large (max 5MB)");
       return;
@@ -34,20 +31,12 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
     reader.onloadend = async () => {
       setUploading(true);
       const result = reader.result as string;
-      await sendMessage("", userSelected._id, result);
+      await sendMessageGroup("", groupSelected?._id, result);
       e.target.value = "";
       setUploading(false);
     };
     reader.readAsDataURL(file);
   };
-
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setInput(e.target.value);
-    },
-    []
-  );
-
   return (
     <div className="flex m-1 p-1">
       <input
@@ -58,7 +47,7 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
         placeholder="Your message... "
         name="text"
         value={input}
-        onChange={handleInputChange}
+        onChange={(e) => setInput(e.target.value)}
         onKeyDown={(e) => (e.key === "Enter" ? sendMessageHandler() : null)}
       />
       <label htmlFor="image" className="mx-2 grid place-items-center">
@@ -79,4 +68,4 @@ const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
   );
 };
 
-export default React.memo(SendMessageBox);
+export default SendMessageBoxGroup;

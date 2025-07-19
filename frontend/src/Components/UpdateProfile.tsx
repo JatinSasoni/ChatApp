@@ -1,13 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import { useCheckAuth } from "../Hooks/checkAuth";
+import { useCheckAuth } from "../Hooks/useCheckAuth";
 import { useState, type ChangeEvent } from "react";
 import { api } from "../../Api/axios";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { setLoggedInUser } from "../../Store/Slices/auth-slice";
 import { IoMdClose } from "react-icons/io";
+import { readAsDataURL } from "../../Utils/readAsDataUrl";
 
 type Inputs = {
   username: string;
@@ -39,16 +40,7 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     let profilePhoto: string | ArrayBuffer | null = "";
     if (profilePic) {
-      profilePhoto = await new Promise<string | null>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result as string);
-        };
-        reader.onerror = () => {
-          reject("Error reading file");
-        };
-        reader.readAsDataURL(profilePic);
-      });
+      profilePhoto = await readAsDataURL(profilePic);
     }
 
     // Submit to backend with the profilePic
@@ -71,10 +63,9 @@ const UpdateProfile: React.FC<Props> = ({ setIsUpdate }) => {
     } catch (error) {
       //*Type guard
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
-        navigate("login");
+        toast.error(error.response?.data.message);
       } else {
-        console.log("An unexpected error occurred:", error);
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);

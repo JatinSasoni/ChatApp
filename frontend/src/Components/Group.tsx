@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
-import { useCheckAuth } from "../Hooks/checkAuth";
-import { useFetchUsers } from "../Hooks/fetchUsers";
+import { useCheckAuth } from "../Hooks/useCheckAuth";
+import { useFetchUsers } from "../Hooks/useFetchUsers";
 import GroupContainer from "./GroupContainer";
 import GroupSidebar from "./GroupSidebar";
 import Navbar from "./Shared/Navbar";
@@ -16,7 +16,7 @@ const Group = () => {
   );
 
   return (
-    <section className="flex">
+    <section className="sm:flex ">
       <Navbar />
       <GroupSidebar />
       <GroupContainer />

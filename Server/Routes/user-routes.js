@@ -4,7 +4,7 @@ import { isAuthenticated } from "../Middleware/isAuthenticated.js";
 import {
   getAllUsersAndUnseenMsgs,
   updateProfile,
-} from "../Controller/User-controller.js";
+} from "../Controller/User-Message-controller.js";
 
 const userRouter = Router();
 

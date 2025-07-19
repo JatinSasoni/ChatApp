@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
-import { useCheckAuth } from "../Hooks/checkAuth";
+import { useCheckAuth } from "../Hooks/useCheckAuth";
 import Navbar from "./Shared/Navbar";
 import { useEffect, useState } from "react";
 import UpdateProfile from "./UpdateProfile";

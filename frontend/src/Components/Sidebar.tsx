@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import { CiSearch } from "react-icons/ci";
-import { useFetchUsers } from "../Hooks/fetchUsers";
+import { useFetchUsers } from "../Hooks/useFetchUsers";
 import { useState } from "react";
 import type { user } from "../../types/models";
 import SidebarUserCard from "./SidebarUserCard";

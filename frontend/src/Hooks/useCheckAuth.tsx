@@ -11,6 +11,7 @@ import { connectToSocket } from "../../Utils/createSocketConnection";
 import { socketContext } from "../../ContextForSocket/context";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export const useCheckAuth = () => {
   const navigate = useNavigate();
@@ -32,7 +33,6 @@ export const useCheckAuth = () => {
             const newSocket = connectToSocket(response.data.user) || null;
             if (newSocket) {
               dispatch(setSocketId(newSocket?.id || null));
-
               newSocket?.on("getOnlineUsers", (userIds: string[]) => {
                 dispatch(setOnlineUsers(userIds));
               });
@@ -43,9 +43,9 @@ export const useCheckAuth = () => {
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
+          toast.error(error.response?.data.message);
         } else {
-          console.log("An unexpected error occurred:", error);
+          toast.error("Something went wrong");
         }
         window.location.href = "/login";
       }

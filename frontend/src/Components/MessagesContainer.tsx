@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import type { Message } from "../../types/models";
 import { useDispatch, useSelector } from "react-redux";
-import { useFetchAndSend } from "../Hooks/fetchAndSendMessage";
+import { useFetchAndSend } from "../Hooks/useFetchAndSendMessage";
 import { useListenMessage } from "../Hooks/useListenMessage";
 import type { RootState } from "../../Store/store";
 import SendMessageBox from "./SendMessageBox";
@@ -9,6 +9,7 @@ import { IoArrowBackSharp } from "react-icons/io5";
 import MessageBox from "./MessageBox";
 import { setUserSelected } from "../../Store/Slices/message-slice";
 import { useNavigate } from "react-router-dom";
+import EmptyState from "./EmptyState";
 
 const MessagesContainer: React.FC = () => {
   const dispatch = useDispatch();
@@ -28,6 +29,9 @@ const MessagesContainer: React.FC = () => {
     }
   }, [userSelected]);
 
+  //* custom-hook to listen/Subscribe to messages
+  useListenMessage();
+
   //* useEffect to scroll to latest message
   useEffect(() => {
     if (divTillScroll && divTillScroll.current && userSelected) {
@@ -36,9 +40,6 @@ const MessagesContainer: React.FC = () => {
       });
     }
   }, [userSelected, selectedUserMessages, uploading]);
-
-  //* custom-hook to listen/Subscribe to messages
-  useListenMessage();
 
   return (
     <section
@@ -104,16 +105,7 @@ const MessagesContainer: React.FC = () => {
         </div>
       ) : (
         // Empty state when no user selected
-        <div className="hidden sm:flex flex-col items-center justify-center w-full h-full bg-gray-100 p-6">
-          <img
-            src="/logo_big.svg"
-            alt="Chat Logo"
-            className="w-80 mb-4 drop-shadow-md"
-          />
-          <p className="text-gray-500 text-sm">
-            Select a conversation to get started
-          </p>
-        </div>
+        <EmptyState />
       )}
     </section>
   );

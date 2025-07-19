@@ -21,8 +21,6 @@ export const useListenMessage = () => {
     if (!SocketContext?.socket) return;
 
     const handleNewMessage = async (newMessage: Message) => {
-      console.log(newMessage);
-
       if (userSelected && userSelected._id === newMessage.senderId._id) {
         dispatch(
           setSelectedUserMsgs([

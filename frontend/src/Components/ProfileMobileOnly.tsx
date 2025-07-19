@@ -11,6 +11,7 @@ const MobileProfile = () => {
   const { userSelected, selectedUserMessages } = useSelector(
     (state: RootState) => state.message
   );
+  const { loggedInUser } = useSelector((state: RootState) => state.auth);
   const [msgImages, setMsgImages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -26,13 +27,13 @@ const MobileProfile = () => {
   }, [selectedUserMessages]);
 
   useEffect(() => {
-    if (isLargeScreen) {
+    if (isLargeScreen || !loggedInUser) {
       navigate("/");
     }
-  }, [isLargeScreen, navigate]);
+  }, [isLargeScreen, navigate, loggedInUser]);
 
   return (
-    <div className="p-2 min-[1160px]:hidden">
+    <section className="p-2 min-[1160px]:hidden">
       <button
         onClick={() => navigate(-1)}
         className="text-md text-blue-500 mb-3"
@@ -40,7 +41,7 @@ const MobileProfile = () => {
         ← Back
       </button>
       <RightSidebarContent userSelected={userSelected} msgImages={msgImages} />
-    </div>
+    </section>
   );
 };
 

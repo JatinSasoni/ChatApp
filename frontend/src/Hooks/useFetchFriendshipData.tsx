@@ -29,9 +29,6 @@ const useFetchFriendshipData = () => {
     } catch (err) {
       if (axios.isAxiosError(err)) {
         toast.error(err.response?.data?.message || "Failed to fetch requests");
-      } else {
-        console.log(err);
-        toast.error("Unexpected error");
       }
     } finally {
       setLoading(false);

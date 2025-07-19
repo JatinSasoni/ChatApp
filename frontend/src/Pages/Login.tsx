@@ -50,10 +50,8 @@ const Login = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
         toast.error(error.response?.data.message);
       } else {
-        console.log("An unexpected error occurred:", error);
         toast.error("An unexpected error occurred");
       }
     } finally {

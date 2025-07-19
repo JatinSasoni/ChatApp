@@ -3,15 +3,12 @@ import type { RootState } from "../../Store/store";
 import { api } from "../../Api/axios";
 import { setSelectedUserMsgs } from "../../Store/Slices/message-slice";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { setLoggedInUser } from "../../Store/Slices/auth-slice";
 import { useCallback, useState } from "react";
 import { setSelectedGroupMessages } from "../../Store/Slices/Group-slice";
 import toast from "react-hot-toast";
 
 export const useFetchAndSend = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [messageLoading, setMessageLoading] = useState<boolean>(false);
   const [groupMessageLoading, setGroupMessageLoading] =
     useState<boolean>(false);
@@ -38,17 +35,15 @@ export const useFetchAndSend = () => {
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
+          toast.error(error.response?.data.message);
         } else {
-          console.log("An unexpected error occurred:", error);
+          toast.error("Something went wrong");
         }
-        // dispatch(setLoggedInUser(null));
-        // navigate("/login");
       } finally {
         setMessageLoading(false);
       }
     },
-    [dispatch, navigate]
+    [dispatch]
   );
 
   //*sendMessageHandler for one-to-one chat
@@ -78,12 +73,10 @@ export const useFetchAndSend = () => {
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
           toast.error(error.response?.data.message);
         } else {
-          console.log("An unexpected error occurred:", error);
+          toast.error("Something went wrong");
         }
-        dispatch(setLoggedInUser(null));
       }
     },
     [dispatch, selectedUserMessages]
@@ -105,9 +98,9 @@ export const useFetchAndSend = () => {
     } catch (error) {
       //*Type guard
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
+        toast.error(error.response?.data.message);
       } else {
-        console.log("An unexpected error occurred:", error);
+        toast.error("Something went wrong");
       }
       // dispatch(setLoggedInUser(null));
       // navigate("/login");
@@ -144,11 +137,10 @@ export const useFetchAndSend = () => {
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
-          console.log(error.response?.data);
+          toast.error(error.response?.data.message);
         } else {
-          console.log("An unexpected error occurred:", error);
+          toast.error("Something went wrong");
         }
-        dispatch(setLoggedInUser(null));
       }
     },
     [dispatch, selectedGroupMessages]

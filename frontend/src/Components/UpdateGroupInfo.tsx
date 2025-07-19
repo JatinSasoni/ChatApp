@@ -12,14 +12,12 @@ import type { RootState } from "../../Store/store";
 import { api } from "../../Api/axios";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 const UpdateGroupInfo = () => {
   type Inputs = {
     groupName: string;
   };
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [groupProfilePic, setGroupProfilePic] = useState<File | null>();
   const { groupSelected, groups } = useSelector(
     (state: RootState) => state.group
@@ -83,16 +81,17 @@ const UpdateGroupInfo = () => {
     } catch (error) {
       //*Type guard
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
+        toast.error(error.response?.data.message);
       } else {
-        console.log("An unexpected error occurred:", error);
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteGroupHandler = async (groupId: string) => {
+  const deleteGroupHandler = async (groupId: string | undefined) => {
+    if (groupId === undefined) return;
     try {
       setIsDeletingGroup(true);
       const response = await api.delete(`/api/v1/groups/${groupId}/delete`);
@@ -110,10 +109,9 @@ const UpdateGroupInfo = () => {
     } catch (error) {
       //*Type guard
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
         toast.error(error.response?.data.message);
       } else {
-        console.log("An unexpected error occurred:", error);
+        toast.error("Something went wrong");
       }
     } finally {
       setIsDeletingGroup(false);
@@ -121,7 +119,7 @@ const UpdateGroupInfo = () => {
   };
 
   return (
-    <section className="backdrop-blur-xs shadow-sm max-sm:h-[calc(100vh-50px)] max-sm:grid max-sm:place-items-center">
+    <section className="backdrop-blur-xs shadow-sm max-sm:h-[calc(100vh)] max-sm:grid max-sm:place-items-center">
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <div className="w-full bg-neutral-50 rounded-lg shadow-lg md:mt-0 sm:max-w-md xl:p-0 ">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8 bg-neutral-100">
@@ -186,10 +184,11 @@ const UpdateGroupInfo = () => {
 
               <button
                 type="button"
+                disabled={isDeletingGroup}
                 onClick={() => deleteGroupHandler(groupSelected?._id)}
                 className="border w-full rounded-md bg-red-400 text-white py-2 outline-none "
               >
-                Delete this group
+                {isDeletingGroup ? "Removing..." : "Delete this group"}
               </button>
               <button
                 type="submit"

@@ -12,6 +12,8 @@ import ProtectChangePass from "./ProtectRoutes/ProtectChangePass";
 import ProfileMobileOnly from "./Components/ProfileMobileOnly";
 import ErrorPage from "./Pages/ErrorPage";
 import Group from "./Components/Group";
+import CreateGroup from "./Components/CreateGroup";
+import GroupProfileMobileOnly from "./Components/GroupProfileMobileOnly";
 
 const Router = createBrowserRouter([
   {
@@ -43,8 +45,16 @@ const Router = createBrowserRouter([
     element: <ProfileMobileOnly />,
   },
   {
+    path: "/chat/mobile/group-profile",
+    element: <GroupProfileMobileOnly />,
+  },
+  {
     path: "/groups",
     element: <Group />,
+  },
+  {
+    path: "/groups/create",
+    element: <CreateGroup />,
   },
   {
     path: "/forgot-password/get-otp",

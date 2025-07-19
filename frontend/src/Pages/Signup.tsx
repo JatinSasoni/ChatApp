@@ -32,10 +32,8 @@ const Signup = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
         toast.error(error.response?.data);
       } else {
-        console.log("An unexpected error occurred:", error);
         toast.error("An unexpected error occurred");
       }
     } finally {

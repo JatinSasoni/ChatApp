@@ -1,8 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { CiUser, CiHome, CiLogout } from "react-icons/ci";
 import { GoPeople } from "react-icons/go";
-import { BsPeople } from "react-icons/bs";
+import { IoAdd } from "react-icons/io5";
 
 import {
   setLoggedInUser,
@@ -19,13 +19,17 @@ import { socketContext } from "../../../ContextForSocket/context";
 import type { RootState } from "../../../Store/store";
 import axios from "axios";
 import { api } from "../../../Api/axios";
+import toast from "react-hot-toast";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+
   const [loading, setLoading] = useState<boolean>(false);
   const SocketContext = useContext(socketContext);
   const { userSelected } = useSelector((state: RootState) => state.message);
+  const { groupSelected } = useSelector((state: RootState) => state.group);
 
   const logoutHandler = async () => {
     try {
@@ -48,10 +52,9 @@ const Navbar: React.FC = () => {
     } catch (error) {
       //*Type guard
       if (axios.isAxiosError(error)) {
-        console.log(error.response?.data);
-        navigate("login");
+        toast.error(error.response?.data.message);
       } else {
-        console.log("An unexpected error occurred:", error);
+        toast.error("Something went wrong");
       }
     } finally {
       setLoading(false);
@@ -61,8 +64,11 @@ const Navbar: React.FC = () => {
   return (
     <header
       className={`flex ${
-        userSelected && "max-lg:hidden"
-      } px-2 max-sm:w-screen sm:h-screen max-sm:pb-2`}
+        ((userSelected && location.pathname === "/") ||
+          (groupSelected && location.pathname === "/groups")) &&
+        "max-lg:hidden"
+      }
+      } px-2 max-sm:w-screen sm:h-screen max-sm:pb-2 `}
     >
       <div className="flex sm:flex-col gap-4 px-2 pt-2 sm:h-full max-sm:w-screen max-sm:justify-between">
         <div className="flex gap-2 justify-center ">
@@ -90,6 +96,12 @@ const Navbar: React.FC = () => {
               <GoPeople
                 className="size-5 hover:scale-105 duration-300 "
                 onClick={() => navigate("/groups")}
+              />
+            </li>
+            <li>
+              <IoAdd
+                className="size-6 hover:scale-105 duration-300 "
+                onClick={() => navigate("/groups/create")}
               />
             </li>
 

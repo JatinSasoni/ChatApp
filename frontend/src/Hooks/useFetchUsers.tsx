@@ -42,9 +42,9 @@ export const useFetchUsers = () => {
       } catch (error) {
         //*Type guard
         if (axios.isAxiosError(error)) {
-          toast.error(error.response?.data.message || "Something went wrong");
+          toast.error(error.response?.data.message);
         } else {
-          console.log("An unexpected error occurred:", error);
+          toast.error("Something went wrong");
         }
       }
     };
