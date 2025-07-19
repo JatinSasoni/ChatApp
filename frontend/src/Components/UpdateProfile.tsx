@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { setLoggedInUser } from "../../Store/Slices/auth-slice";
 import { IoMdClose } from "react-icons/io";
 import { readAsDataURL } from "../../Utils/readAsDataUrl";
+import toast from "react-hot-toast";
 
 type Inputs = {
   username: string;
