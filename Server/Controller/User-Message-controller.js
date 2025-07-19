@@ -33,7 +33,7 @@ export const getAllUsersAndUnseenMsgs = async (req, res, next) => {
 export const getSelectedUser = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const selectedUserId = req.params.id;
+    const { selectedUserId } = req.params;
 
     //FETCH ALL SELECTED USERS MESSAGES
     const selectedUserMessages = await MessageModel.find({

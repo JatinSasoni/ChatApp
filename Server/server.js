@@ -58,13 +58,13 @@ export const userSocketMap = {};
 // Socket.io connection handler
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
-  console.log("user connected ", userId);
+  // console.log("user connected ", userId);
   if (userId) userSocketMap[userId] = socket.id;
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
-    console.log("user disconnected ", userId);
+    // console.log("user disconnected ", userId);
     delete userSocketMap[userId];
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
@@ -73,14 +73,14 @@ io.on("connection", (socket) => {
     groupIds.forEach((groupId) => {
       socket.join(groupId);
     });
-    console.log(`${username} joined groups:`, groupIds);
+    // console.log(`${username} joined groups:`, groupIds);
   });
 
   socket.on("leaveMultipleGroups", ({ groupIds, username }) => {
     groupIds.forEach((groupId) => {
       socket.leave(groupId);
     });
-    console.log(`${username} left groups:`, groupIds);
+    // console.log(`${username} left groups:`, groupIds);
   });
 });
 

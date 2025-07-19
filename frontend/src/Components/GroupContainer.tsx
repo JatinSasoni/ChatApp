@@ -39,8 +39,6 @@ const GroupContainer = () => {
   //* useEffect to scroll to latest message
   useEffect(() => {
     if (divTillScroll && divTillScroll.current && groupSelected) {
-      console.log("ok");
-
       divTillScroll.current.scrollIntoView({
         behavior: "smooth",
       });

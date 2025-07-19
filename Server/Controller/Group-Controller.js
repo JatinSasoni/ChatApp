@@ -131,7 +131,7 @@ export const getGroupMessages = async (req, res, next) => {
 export const markMessagesSeenGroup = async (req, res, next) => {
   try {
     const user = req.user;
-    const messageId = req.params.messageId;
+    const { messageId } = req.params;
     await MessageModel.updateOne(
       { _id: messageId, seenBy: { $ne: user._id } }, // only if not already seen
       { $push: { seenBy: user._id } }
