@@ -147,3 +147,8 @@ export const sendMessage = async (req, res, next) => {
     next(error);
   }
 };
+
+//RENDER
+export const isLive = async (req, res, next) => {
+  return res.status(200).json({ success: true, message: "Server live :)" });
+};

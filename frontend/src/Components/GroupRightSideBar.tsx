@@ -17,7 +17,6 @@ const GroupRightSideBar = () => {
         .map((msg) => msg.image) || []
     );
   }, [selectedGroupMessages, groupSelected]);
-  console.log("ok");
 
   return (
     <section

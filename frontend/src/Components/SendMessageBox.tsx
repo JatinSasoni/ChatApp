@@ -10,6 +10,8 @@ type Props = {
 };
 
 const SendMessageBox: React.FC<Props> = ({ setUploading, uploading }) => {
+  console.log("ok");
+
   const [input, setInput] = useState<string>("");
   const { userSelected } = useSelector((state: RootState) => state.message);
 
