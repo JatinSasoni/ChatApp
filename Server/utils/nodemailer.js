@@ -1,7 +1,5 @@
 import { createTransport } from "nodemailer";
-import { configDotenv } from "dotenv";
 
-configDotenv();
 export const transporter = createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,

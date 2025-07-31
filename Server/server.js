@@ -1,5 +1,5 @@
+import "dotenv/config";
 import express, { urlencoded } from "express";
-import { configDotenv } from "dotenv";
 import authRouter from "./Routes/auth-routes.js";
 import { connectToDB } from "./utils/db.js";
 import userRouter from "./Routes/user-routes.js";
@@ -11,10 +11,8 @@ import cookieParser from "cookie-parser";
 import { transporter } from "./utils/nodemailer.js";
 import friendshipRoute from "./Routes/friendship-routes.js";
 import groupRouter from "./Routes/group-routes.js";
-import { log } from "console";
 
 //Dot-env
-configDotenv();
 
 //Initialize App
 const app = express();
