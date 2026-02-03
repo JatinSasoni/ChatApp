@@ -8,7 +8,6 @@ type Props = {
   actionType: "accept" | "cancel" | "unfriend";
   secondActionType?: "reject";
 };
-
 const FriendAndRequestCard: React.FC<Props> = ({
   user,
   actionType,
