@@ -12,20 +12,22 @@ import { useNavigate } from "react-router-dom";
 import EmptyState from "./EmptyState";
 
 const MessagesContainer: React.FC = () => {
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [uploading, setUploading] = useState<boolean>(false);
   const divTillScroll = useRef<HTMLDivElement>(null);
-  const { userSelected, selectedUserMessages } = useSelector(
-    (state: RootState) => state.message
-  );
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const topObserverRef = useRef<HTMLDivElement | null>(null);
+  const { userSelected, selectedUserMessages, nextCursor, hasMore } =
+    useSelector((state: RootState) => state.message);
   const { onlineUsers } = useSelector((state: RootState) => state.auth);
   const { fetchUserMessagesHandler, messageLoading } = useFetchAndSend(); //CUSTOM HOOK
 
   //* useEffect to fetch selected user's messages
   useEffect(() => {
     if (userSelected) {
-      fetchUserMessagesHandler(userSelected._id);
+      fetchUserMessagesHandler(userSelected._id, nextCursor, true);
     }
   }, [userSelected]);
 
@@ -40,6 +42,43 @@ const MessagesContainer: React.FC = () => {
       });
     }
   }, [userSelected, selectedUserMessages, uploading]);
+
+  useEffect(() => {
+    if (
+      !topObserverRef.current ||
+      !scrollContainerRef.current ||
+      !hasMore ||
+      !nextCursor ||
+      !userSelected
+    )
+      return;
+
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting && !loadingMore) {
+          setLoadingMore(true);
+          const previousHeight = scrollContainerRef.current?.scrollHeight;
+          await fetchUserMessagesHandler(userSelected._id, nextCursor, false);
+          requestAnimationFrame(() => {
+            const container = scrollContainerRef.current;
+            if (container && previousHeight) {
+              const newHeight = container.scrollHeight;
+              container.scrollTop = newHeight - previousHeight;
+            }
+          });
+          setLoadingMore(false);
+        }
+      },
+      {
+        root: scrollContainerRef.current, // scroll container
+        threshold: 1,
+      }
+    );
+
+    observer.observe(topObserverRef.current);
+    return () => observer.disconnect();
+  }, [hasMore, nextCursor, userSelected?._id]);
 
   return (
     <section
@@ -77,7 +116,12 @@ const MessagesContainer: React.FC = () => {
           </header>
 
           {/* Message List */}
-          <div className="flex-1 overflow-y-auto px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover">
+
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover"
+          >
+            <div ref={topObserverRef} />
             {messageLoading ? (
               <div className="h-full grid place-items-center text-lg text-gray-500">
                 <span className="loader2" />

@@ -1,11 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import { api } from "../../Api/axios";
-import { setSelectedUserMsgs } from "../../Store/Slices/message-slice";
+import {
+  appendMessages,
+  prependMessages,
+  setCursor,
+  setHasMore,
+  setSelectedUserMsgs,
+} from "../../Store/Slices/message-slice";
 import axios from "axios";
 import { useCallback, useState } from "react";
 import { setSelectedGroupMessages } from "../../Store/Slices/Group-slice";
 import toast from "react-hot-toast";
+
+const LIMIT = 10;
 
 export const useFetchAndSend = () => {
   const dispatch = useDispatch();
@@ -23,14 +31,31 @@ export const useFetchAndSend = () => {
 
   //* Fetching user messages and images
   const fetchUserMessagesHandler = useCallback(
-    async (selectedUserId: string) => {
+    async (
+      selectedUserId: string,
+      cursor?: string | null,
+      initialLoad: boolean = false
+    ) => {
       try {
         setMessageLoading(true);
         const response = await api.get(`/api/v1/message/${selectedUserId}`, {
+          params: {
+            limit: LIMIT,
+            ...(cursor && { cursor }),
+          },
           withCredentials: true,
         });
         if (response.data.success) {
-          dispatch(setSelectedUserMsgs(response?.data?.selectedUserMessages));
+          console.log(response.data);
+          const { selectedUserMessages, nextCursor, hasMore } = response.data;
+          if (initialLoad) {
+            dispatch(setSelectedUserMsgs(selectedUserMessages.reverse()));
+          } else {
+            dispatch(prependMessages(selectedUserMessages.reverse()));
+          }
+
+          dispatch(setCursor(nextCursor));
+          dispatch(setHasMore(hasMore));
         }
       } catch (error) {
         //*Type guard
@@ -62,13 +87,9 @@ export const useFetchAndSend = () => {
             withCredentials: true,
           }
         );
+        console.log(response.data);
         if (response?.data?.success) {
-          dispatch(
-            setSelectedUserMsgs([
-              ...(selectedUserMessages || []), //COZ TYPE OF selectedUserMessages could be of null type
-              response.data.newMessage,
-            ])
-          );
+          dispatch(appendMessages(response.data.newMessage));
         }
       } catch (error) {
         //*Type guard
@@ -77,6 +98,7 @@ export const useFetchAndSend = () => {
         } else {
           toast.error("Something went wrong");
         }
+        console.log(error);
       }
     },
     [dispatch, selectedUserMessages]

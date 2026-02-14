@@ -34,14 +34,26 @@ export const getSelectedUser = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const { selectedUserId } = req.params;
+    const { cursor, limit } = req.query;
+    console.log(cursor);
 
-    //FETCH ALL SELECTED USERS MESSAGES
-    const selectedUserMessages = await MessageModel.find({
+    const query = {
       $or: [
         { senderId: userId, receiverId: selectedUserId },
         { senderId: selectedUserId, receiverId: userId },
       ],
-    }).populate("senderId", "Profile");
+    };
+
+    if (cursor) {
+      query._id = { $lt: cursor };
+    }
+
+    //FETCH ALL SELECTED USERS MESSAGES
+    const selectedUserMessages = await MessageModel.find(query)
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .populate("senderId", "Profile");
+
     // Mark messages from selected user as seen
     await MessageModel.updateMany(
       {
@@ -52,9 +64,16 @@ export const getSelectedUser = async (req, res, next) => {
       { $push: { seenBy: userId } }
     );
 
-    return res.status(200).json({ success: true, selectedUserMessages });
+    return res.status(200).json({
+      success: true,
+      selectedUserMessages,
+      nextCursor: selectedUserMessages.length
+        ? selectedUserMessages[selectedUserMessages.length - 1]._id
+        : null,
+      hasMore: selectedUserMessages.length === Number(limit),
+    });
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     next(error);
   }
 };
