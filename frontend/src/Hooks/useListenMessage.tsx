@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { socketContext } from "../../ContextForSocket/context";
 import type { Message } from "../../types/models";
 import {
@@ -17,25 +17,32 @@ export const useListenMessage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const SocketContext = useContext(socketContext);
 
+  const messagesRef = useRef(selectedUserMessages);
+  const unseenRef = useRef(unseenMessages);
+  messagesRef.current = selectedUserMessages;
+  unseenRef.current = unseenMessages;
+
   useEffect(() => {
     if (!SocketContext?.socket) return;
 
     const handleNewMessage = async (newMessage: Message) => {
-      if (userSelected && userSelected._id === newMessage.senderId._id) {
+      const currentUser = userSelected;
+      const currentMessages = messagesRef.current;
+      const currentUnseen = unseenRef.current;
+      if (currentUser && currentUser._id === newMessage.senderId._id) {
         dispatch(
           setSelectedUserMsgs([
-            ...(selectedUserMessages || []),
+            ...(currentMessages || []),
             { ...newMessage, seenBy: loggedInUser ? [loggedInUser._id] : [] },
           ])
         );
-
         await api.put(`/api/v1/message/mark/${newMessage._id}`, "");
       } else {
         dispatch(
           setUnseenMessages({
-            ...unseenMessages,
-            [newMessage.senderId._id]: unseenMessages[newMessage.senderId._id]
-              ? unseenMessages[newMessage.senderId._id] + 1
+            ...currentUnseen,
+            [newMessage.senderId._id]: currentUnseen[newMessage.senderId._id]
+              ? currentUnseen[newMessage.senderId._id] + 1
               : 1,
           })
         );
@@ -43,16 +50,8 @@ export const useListenMessage = () => {
     };
 
     SocketContext.socket.on("newMessage", handleNewMessage);
-
     return () => {
       SocketContext.socket?.off("newMessage", handleNewMessage);
     };
-  }, [
-    SocketContext?.socket,
-    userSelected,
-    loggedInUser,
-    dispatch,
-    selectedUserMessages,
-    unseenMessages,
-  ]);
+  }, [SocketContext?.socket, userSelected, loggedInUser, dispatch]);
 };

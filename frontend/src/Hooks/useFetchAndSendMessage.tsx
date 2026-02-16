@@ -46,7 +46,6 @@ export const useFetchAndSend = () => {
           withCredentials: true,
         });
         if (response.data.success) {
-          console.log(response.data);
           const { selectedUserMessages, nextCursor, hasMore } = response.data;
           if (initialLoad) {
             dispatch(setSelectedUserMsgs(selectedUserMessages.reverse()));
@@ -83,25 +82,22 @@ export const useFetchAndSend = () => {
         const response = await api.post(
           `api/v1/message/send/${selectedUserId}`,
           { text: input, image: image },
-          {
-            withCredentials: true,
-          }
-        );
-        console.log(response.data);
+        {
+          withCredentials: true,
+        }
+      );
         if (response?.data?.success) {
           dispatch(appendMessages(response.data.newMessage));
         }
       } catch (error) {
-        //*Type guard
         if (axios.isAxiosError(error)) {
           toast.error(error.response?.data.message);
         } else {
           toast.error("Something went wrong");
         }
-        console.log(error);
       }
     },
-    [dispatch, selectedUserMessages]
+    [dispatch]
   );
 
   //* Fetching group messages and images

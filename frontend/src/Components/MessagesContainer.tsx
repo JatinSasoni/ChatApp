@@ -12,73 +12,116 @@ import { useNavigate } from "react-router-dom";
 import EmptyState from "./EmptyState";
 
 const MessagesContainer: React.FC = () => {
-  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [uploading, setUploading] = useState<boolean>(false);
-  const divTillScroll = useRef<HTMLDivElement>(null);
+  const [canObserveTop, setCanObserveTop] = useState<boolean>(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const topObserverRef = useRef<HTMLDivElement | null>(null);
+  const topSentinelRef = useRef<HTMLDivElement | null>(null);
+  const didInitialScrollRef = useRef<boolean>(false);
   const { userSelected, selectedUserMessages, nextCursor, hasMore } =
     useSelector((state: RootState) => state.message);
   const { onlineUsers } = useSelector((state: RootState) => state.auth);
-  const { fetchUserMessagesHandler, messageLoading } = useFetchAndSend(); //CUSTOM HOOK
+  const { fetchUserMessagesHandler, messageLoading } = useFetchAndSend();
 
-  //* useEffect to fetch selected user's messages
+  // Reset scroll state when switching users
   useEffect(() => {
     if (userSelected) {
-      fetchUserMessagesHandler(userSelected._id, nextCursor, true);
+      setCanObserveTop(false);
+      didInitialScrollRef.current = false;
     }
-  }, [userSelected]);
+  }, [userSelected?._id]);
+
+  // Fetch selected user's messages on user change (initial load without cursor)
+  useEffect(() => {
+    if (userSelected) {
+      fetchUserMessagesHandler(userSelected._id, undefined, true);
+    }
+  }, [userSelected?._id]);
+
+  // Scroll to bottom only on initial load so sentinel is off-screen; then allow infinite-scroll observer
+  useEffect(() => {
+    if (messageLoading || !selectedUserMessages?.length || didInitialScrollRef.current) return;
+    const el = scrollContainerRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight - el.clientHeight;
+      didInitialScrollRef.current = true;
+      setCanObserveTop(true);
+    }
+  }, [messageLoading, selectedUserMessages?.length]);
+
+  // Infinite scroll: load older messages when user scrolls to top (only after initial scroll to bottom)
+  useEffect(() => {
+    if (
+      !topSentinelRef.current ||
+      !scrollContainerRef.current ||
+      !hasMore ||
+      !nextCursor ||
+      !userSelected ||
+      messageLoading ||
+      selectedUserMessages?.length === 0 ||
+      !canObserveTop
+    )
+      return;
+
+    const root = scrollContainerRef.current;
+    const sentinel = topSentinelRef.current;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry.isIntersecting || loadingMore) return;
+
+        const container = scrollContainerRef.current;
+        if (!container) return;
+        setLoadingMore(true);
+        const previousHeight = container.scrollHeight;
+        fetchUserMessagesHandler(userSelected._id, nextCursor, false)
+          .then(() => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                if (scrollContainerRef.current) {
+                  scrollContainerRef.current.scrollTop =
+                    scrollContainerRef.current.scrollHeight - previousHeight;
+                }
+              });
+            });
+          })
+          .finally(() => setLoadingMore(false));
+      },
+      {
+        root,
+        rootMargin: "0px",
+        threshold: 0,
+      }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [
+    hasMore,
+    nextCursor,
+    userSelected?._id,
+    loadingMore,
+    messageLoading,
+    selectedUserMessages?.length,
+    canObserveTop,
+    fetchUserMessagesHandler,
+  ]);
 
   //* custom-hook to listen/Subscribe to messages
   useListenMessage();
 
   //* useEffect to scroll to latest message
-  useEffect(() => {
-    if (divTillScroll && divTillScroll.current && userSelected) {
-      divTillScroll.current.scrollIntoView({
-        behavior: "smooth",
-      });
-    }
-  }, [userSelected, selectedUserMessages, uploading]);
-
-  useEffect(() => {
-    if (
-      !topObserverRef.current ||
-      !scrollContainerRef.current ||
-      !hasMore ||
-      !nextCursor ||
-      !userSelected
-    )
-      return;
-
-    const observer = new IntersectionObserver(
-      async (entries) => {
-        const entry = entries[0];
-        if (entry.isIntersecting && !loadingMore) {
-          setLoadingMore(true);
-          const previousHeight = scrollContainerRef.current?.scrollHeight;
-          await fetchUserMessagesHandler(userSelected._id, nextCursor, false);
-          requestAnimationFrame(() => {
-            const container = scrollContainerRef.current;
-            if (container && previousHeight) {
-              const newHeight = container.scrollHeight;
-              container.scrollTop = newHeight - previousHeight;
-            }
-          });
-          setLoadingMore(false);
-        }
-      },
-      {
-        root: scrollContainerRef.current, // scroll container
-        threshold: 1,
-      }
-    );
-
-    observer.observe(topObserverRef.current);
-    return () => observer.disconnect();
-  }, [hasMore, nextCursor, userSelected?._id]);
+  // const divTillScroll = useRef<HTMLDivElement>(null);
+  // useEffect(() => {
+  //   if (divTillScroll && divTillScroll.current && userSelected) {
+  //     divTillScroll.current.scrollIntoView({
+  //       behavior: "smooth",
+  //     });
+  //   }
+  // }, [userSelected, selectedUserMessages, uploading]);
 
   return (
     <section
@@ -116,20 +159,35 @@ const MessagesContainer: React.FC = () => {
           </header>
 
           {/* Message List */}
-
           <div
             ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover"
+            className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-2 bg-[url('/chatbg.jpg')] bg-cover"
           >
-            <div ref={topObserverRef} />
-            {messageLoading ? (
+            {/* Single sentinel at top for infinite scroll; only meaningful when we have messages */}
+            {selectedUserMessages && selectedUserMessages.length > 0 && (
+              <div
+                ref={topSentinelRef}
+                style={{ height: 1, minHeight: 1 }}
+                aria-hidden="true"
+              />
+            )}
+            {/* Full-screen loader only on initial load (no messages yet); otherwise show list */}
+            {messageLoading && !selectedUserMessages?.length ? (
               <div className="h-full grid place-items-center text-lg text-gray-500">
                 <span className="loader2" />
               </div>
             ) : (
-              selectedUserMessages?.map((message: Message) => (
-                <MessageBox message={message} key={message._id} />
-              ))
+              <>
+                {loadingMore && (
+                  <div className="py-2 flex items-center justify-center gap-2 text-sm text-gray-500">
+                    <span className="loader2" style={{ width: 18, height: 18 }} />
+                    <span>Loading older messages...</span>
+                  </div>
+                )}
+                {selectedUserMessages?.map((message: Message) => (
+                  <MessageBox message={message} key={message._id} />
+                ))}
+              </>
             )}
 
             {uploading && (
@@ -139,7 +197,7 @@ const MessagesContainer: React.FC = () => {
             )}
 
             {/* Scroll anchor */}
-            <div ref={divTillScroll} />
+            {/* <div ref={divTillScroll} /> */}
           </div>
 
           {/* Send Message Box */}

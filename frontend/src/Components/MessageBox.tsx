@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../Store/store";
 import type { Message } from "../../types/models";
@@ -8,7 +8,7 @@ type Props = {
   message: Message;
 };
 
-const MessageBox: React.FC<Props> = ({ message }) => {
+const MessageBox: React.FC<Props> = memo(function MessageBox({ message }) {
   const { loggedInUser } = useSelector((state: RootState) => state.auth);
   const isCurrentUser = message.senderId._id === loggedInUser?._id;
 
@@ -58,7 +58,7 @@ const MessageBox: React.FC<Props> = ({ message }) => {
       </div>
     </div>
   );
-};
+});
 
 function MessageTimestamp({
   time,
