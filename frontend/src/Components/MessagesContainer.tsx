@@ -42,7 +42,12 @@ const MessagesContainer: React.FC = () => {
 
   // Scroll to bottom only on initial load so sentinel is off-screen; then allow infinite-scroll observer
   useEffect(() => {
-    if (messageLoading || !selectedUserMessages?.length || didInitialScrollRef.current) return;
+    if (
+      messageLoading ||
+      !selectedUserMessages?.length ||
+      didInitialScrollRef.current
+    )
+      return;
     const el = scrollContainerRef.current;
     if (el) {
       el.scrollTop = el.scrollHeight - el.clientHeight;
@@ -180,7 +185,10 @@ const MessagesContainer: React.FC = () => {
               <>
                 {loadingMore && (
                   <div className="py-2 flex items-center justify-center gap-2 text-sm text-gray-500">
-                    <span className="loader2" style={{ width: 18, height: 18 }} />
+                    <span
+                      className="loader2"
+                      style={{ width: 18, height: 18 }}
+                    />
                     <span>Loading older messages...</span>
                   </div>
                 )}
