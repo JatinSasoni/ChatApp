@@ -105,7 +105,8 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 7000;
 
 // Listen
-await connectToDB(process.env.MONGODB_URI);
-server.listen(PORT, async () => {
-  console.log(`Server started at PORT ${PORT}`);
+connectToDB(process.env.MONGODB_URI).then(() => {
+  server.listen(PORT, async () => {
+    console.log(`Server started at PORT ${PORT}`);
+  });
 });
